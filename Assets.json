@@ -1,0 +1,116 @@
+{
+    "version":  1,
+    "generatedAtUtc":  "2026-02-25T21:11:53Z",
+    "root":  "Assets",
+    "notes":  [
+                  "This file is the canonical asset catalog for the repository.",
+                  "Use sourcePath values for source media in Assets/.",
+                  "Copy or optimize into src/assets/ only when needed for runtime."
+              ],
+    "assets":  [
+                   {
+                       "id":  "20230314_mib_0198_working_splash_2023",
+                       "filename":  "20230314_MIB_0198-Working-Splash-2023.webp",
+                       "sourcePath":  "Assets/20230314_MIB_0198-Working-Splash-2023.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  50992,
+                       "sha256":  "fef4adba3c5dc20605e2216b40b63372e70093fc5f44e9ed1c5711e5c82afb85",
+                       "tags":  [
+                                    "hero"
+                                ]
+                   },
+                   {
+                       "id":  "20260225_1243_01kjb7hvpff0wa3y2484cm199p",
+                       "filename":  "20260225_1243_01kjb7hvpff0wa3y2484cm199p.mp4",
+                       "sourcePath":  "Assets/20260225_1243_01kjb7hvpff0wa3y2484cm199p.mp4",
+                       "type":  "video",
+                       "extension":  ".mp4",
+                       "sizeBytes":  4078065,
+                       "sha256":  "0921f4df7f03155bf3f656a78a455b4d40a43c35605fba7af5b6d19b3babe922",
+                       "tags":  [
+                                    "reference",
+                                    "hero",
+                                    "transition"
+                                ]
+                   },
+                   {
+                       "id":  "25_26report_email",
+                       "filename":  "25-26report-email.webp",
+                       "sourcePath":  "Assets/25-26report-email.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  1248750,
+                       "sha256":  "099e8524bba1ac12e3c2aed9a6237ca6e54a9eb5ef53dcf68f7e85641dca1bcc",
+                       "tags":  [
+                                    "marketing"
+                                ]
+                   },
+                   {
+                       "id":  "bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy",
+                       "filename":  "bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy.jpg",
+                       "sourcePath":  "Assets/bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  419966,
+                       "sha256":  "725d6f4eac637a0195429f7a8d390922a71c72f30dbe9eed38e43a62fe2ec9b3",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "chatgpt_image_feb_25_2026_01_07_16_pm",
+                       "filename":  "ChatGPT Image Feb 25, 2026, 01_07_16 PM.png",
+                       "sourcePath":  "Assets/ChatGPT Image Feb 25, 2026, 01_07_16 PM.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  2129676,
+                       "sha256":  "2bb5149537ce0dffdc8dad87314103d24ab7f989ebec3f385671d0f5e2c94e0c",
+                       "tags":  [
+                                    "generated"
+                                ]
+                   },
+                   {
+                       "id":  "hq720",
+                       "filename":  "hq720.jpg",
+                       "sourcePath":  "Assets/hq720.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  52869,
+                       "sha256":  "ab0376522b7a0e996a9396521affe7cda8a1eea18d137b9a29370e386b2862ea",
+                       "tags":  [
+                                    "thumbnail"
+                                ]
+                   },
+                   {
+                       "id":  "mib_medianetwork_v2_black",
+                       "filename":  "mib-medianetwork-v2-black.png",
+                       "sourcePath":  "Assets/mib-medianetwork-v2-black.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  28430,
+                       "sha256":  "8b1e07cb8cfcc7b520ac08b8f3601df50b2ac2ee7950a997154e232b8ec5301d",
+                       "tags":  [
+                                    "brand"
+                                ]
+                   }
+               ],
+    "lookup":  {
+                   "brand":  [
+                                 "mib_medianetwork_v2_black"
+                             ],
+                   "heroReference":  [
+                                         "20230314_mib_0198_working_splash_2023",
+                                         "20260225_1243_01kjb7hvpff0wa3y2484cm199p"
+                                     ],
+                   "transitionReference":  [
+                                               "20260225_1243_01kjb7hvpff0wa3y2484cm199p"
+                                           ],
+                   "miscReference":  [
+                                         "25_26report_email",
+                                         "bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy",
+                                         "chatgpt_image_feb_25_2026_01_07_16_pm",
+                                         "hq720"
+                                     ]
+               }
+}
