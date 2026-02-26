@@ -1,10 +1,18 @@
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import { Color, MathUtils, type Mesh, type MeshBasicMaterial } from 'three'
+import {
+  AdditiveBlending,
+  Color,
+  MathUtils,
+  type Mesh,
+  type MeshBasicMaterial,
+  type Texture,
+} from 'three'
 
 type LightStreaksProps = {
   intensity: number
   reducedMotion: boolean
+  mapTexture?: Texture | null
 }
 
 type Streak = {
@@ -21,7 +29,11 @@ type Streak = {
   phase: number
 }
 
-export function LightStreaks({ intensity, reducedMotion }: LightStreaksProps) {
+export function LightStreaks({
+  intensity,
+  reducedMotion,
+  mapTexture,
+}: LightStreaksProps) {
   const streakRefs = useRef<Mesh[]>([])
   const streaks = useMemo<Streak[]>(
     () =>
@@ -94,6 +106,11 @@ export function LightStreaks({ intensity, reducedMotion }: LightStreaksProps) {
             color={new Color().setHSL(0.55 + streak.hueOffset, 0.9, 0.72)}
             transparent
             opacity={visibility * 0.65}
+            map={mapTexture ?? undefined}
+            alphaMap={mapTexture ?? undefined}
+            alphaTest={mapTexture ? 0.04 : 0}
+            blending={AdditiveBlending}
+            depthWrite={false}
           />
         </mesh>
       ))}

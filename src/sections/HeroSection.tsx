@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { HERO_BEATS, getCurrentBeat } from '../config/heroTransitionBeats'
 import { Section } from '../components/layout/Section'
 import { CTAButton } from '../components/ui/CTAButton'
 
@@ -16,6 +17,22 @@ export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
+  const [localProgress, setLocalProgress] = useState(0)
+
+  const beat = useMemo(
+    () => getCurrentBeat(HERO_BEATS, localProgress),
+    [localProgress],
+  )
+
+  const overlayStyle = useMemo(
+    () =>
+      ({
+        '--hero-overlay-opacity': reducedMotion
+          ? '0.74'
+          : (0.5 + Math.min(Math.max(localProgress, 0), 1) * 0.22).toFixed(3),
+      }) as CSSProperties,
+    [localProgress, reducedMotion],
+  )
 
   useLayoutEffect(() => {
     const section = sectionRef.current
@@ -30,14 +47,24 @@ export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
       pin: !reducedMotion,
       scrub: reducedMotion ? false : 1,
       anticipatePin: 1,
-      onUpdate: (self) => onProgress(self.progress),
-      onLeaveBack: () => onProgress(0),
-      onLeave: () => onProgress(1),
+      onUpdate: (self) => {
+        onProgress(self.progress)
+        setLocalProgress(self.progress)
+      },
+      onLeaveBack: () => {
+        onProgress(0)
+        setLocalProgress(0)
+      },
+      onLeave: () => {
+        onProgress(1)
+        setLocalProgress(1)
+      },
     })
 
     return () => {
       trigger.kill()
       onProgress(0)
+      setLocalProgress(0)
     }
   }, [onProgress, reducedMotion])
 
@@ -79,7 +106,12 @@ export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
 
   return (
     <Section id="hero" className="section--hero" ref={sectionRef}>
-      <div className="hero-overlay" ref={overlayRef}>
+      <div
+        className="hero-overlay"
+        ref={overlayRef}
+        style={overlayStyle}
+        data-hero-beat={beat.id}
+      >
         <p className="eyebrow">Men in Blazers</p>
         <p className="hero-kicker">Matchweek Opening Sequence</p>
         <h1 className="hero-title" ref={titleRef}>
@@ -91,7 +123,7 @@ export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
         <div className="hero-meta" aria-label="intro metadata">
           <span>Episode 01</span>
           <span aria-hidden>&bull;</span>
-          <span>Scroll to enter</span>
+          <span>{beat.label}</span>
         </div>
         <div className="cta-row">
           <CTAButton variant="primary">Watch</CTAButton>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Men in Blazers Mark Placeholder</title>
+  <desc id="desc">Temporary compact mark placeholder.</desc>
+  <defs>
+    <radialGradient id="markGrad" cx="45%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#eaf9ff" />
+      <stop offset="60%" stop-color="#8fd0ff" />
+      <stop offset="100%" stop-color="#3c82b7" />
+    </radialGradient>
+  </defs>
+  <rect width="96" height="96" rx="16" fill="#061327" />
+  <circle cx="48" cy="48" r="30" fill="url(#markGrad)" />
+  <path d="M32 64 L32 32 L42 32 L48 42 L54 32 L64 32 L64 64 L56 64 L56 46 L48 56 L40 46 L40 64 Z" fill="#061327" />
+</svg>

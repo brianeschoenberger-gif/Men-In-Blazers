@@ -4,11 +4,11 @@ export function PlaceholderNextSection() {
   return (
     <Section id="next" className="section--next">
       <div className="placeholder-card">
-        <p className="eyebrow">Milestone 4</p>
-        <h2>Featured Stories Placeholder</h2>
+        <p className="eyebrow">Milestone 5</p>
+        <h2>Network Wall Placeholder</h2>
         <p>
-          Tour Stops now hands off here. Milestone 4 will introduce constellation
-          discovery cards for featured stories.
+          Featured Stories now hands off here. Milestone 5 will introduce the
+          network wall for shows and channels.
         </p>
       </div>
     </Section>

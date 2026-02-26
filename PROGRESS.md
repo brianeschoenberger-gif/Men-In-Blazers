@@ -15,6 +15,185 @@
 - Remaining / next:
 ```
 
+## 2026-02-26
+- Milestones touched: 1-2 (hero "Tunnel to Pitch" art pass refinement).
+- Skills used (or "none"): `threejs-textures`, `threejs-materials`, `threejs-lighting`, `threejs-animation` (`gsap-scrolltrigger` intentionally skipped because scroll choreography was not changed).
+- Completed:
+  - Upgraded `HeroScene` tunnel material response by wiring optional AO maps with `uv2` setup on segment geometry.
+  - Added a richer practical-light stack (side practical strips + retuned ceiling/beam behavior) to better define depth during H2-H4.
+  - Added a layered portal finish (halo, rim veil, and floor bounce) with beat-aware opacity/intensity so H5 reads brighter without fully washing out the tunnel.
+  - Kept reduced-motion and tiered fallback behavior intact while preserving DOM-first hero content.
+  - Rebalanced hero overlay opacity progression in `HeroSection` to reveal more of the revised scene while keeping CTA readability.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Run a visual baseline refresh (`cmd /c npm run test:visual:update`) once this look direction is approved.
+  - Optional follow-up: fine-tune portal halo/rim intensity from side-by-side reference stills.
+
+## 2026-02-26
+- Milestones touched: tooling support (image generation workflow reliability).
+- Skills used (or "none"): `imagegen`.
+- Completed:
+  - Added repo-local launcher `scripts/image_gen.py` so the documented skill command path now works in this repository.
+  - Wired launcher fallback resolution to both local skill path (`.agents/skills/imagegen/scripts/image_gen.py`) and global Codex skill path (`~/.codex/skills/imagegen/scripts/image_gen.py`).
+  - Updated `SETUP.md` with explicit Python dependency install and imagegen health-check command.
+  - Installed missing Python dependency `openai` (Pillow already present) in this environment.
+- Validation run:
+  - `python scripts/image_gen.py --help`
+  - `python scripts/image_gen.py generate --prompt "health check" --dry-run`
+  - `python -c "import importlib.util; print(bool(importlib.util.find_spec('openai')))"` (returns `True`)
+- Remaining / next:
+  - Set `OPENAI_API_KEY` in your shell to enable live generations (dry-run already works).
+
+## 2026-02-26
+- Milestones touched: 1-2 (hero tunnel-end stadium crowd pass).
+- Skills used (or "none"): `threejs-textures` (`imagegen` intentionally skipped: `OPENAI_API_KEY` not set for live generation).
+- Completed:
+  - Added free-use source crowd photo into `Assets/free-open/downloads/stadium_crowd_pixabay_3638371_1280.jpg` and logged provenance in `Assets/free-open/SOURCES.md`.
+  - Generated graded runtime crowd plates (`2k` + `1k`) at `src/assets/textures/hero/stadium_crowd_plate*.webp` with matching source-derived copies under `Assets/free-open/generated/textures/hero/`.
+  - Extended `src/three/assets/assetManifest.ts` with new `stadium_crowd_plate` texture key.
+  - Updated `HeroScene` tunnel-exit stack to render the crowd plate with beat-driven reveal opacity so the portal resolves into a visible stadium audience instead of flat color bars.
+  - Regenerated `Assets.json` after asset additions.
+- Validation run:
+  - `powershell -ExecutionPolicy Bypass -File scripts/generate-assets-json.ps1`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+  - `cmd /c npm run test:visual`
+- Remaining / next:
+  - Tune crowd plane crop/grade against your preferred reference still (warmer vs cooler, more/less blur).
+  - If desired, replace with a custom generated crowd plate once `OPENAI_API_KEY` is available.
+
+## 2026-02-26
+- Milestones touched: 1-2 (hero visual direction correction).
+- Skills used (or "none"): `threejs-lighting`, `threejs-textures`, `threejs-postprocessing`.
+- Completed:
+  - Reworked Hero opening palette and scene composition to match warm tunnel reference more closely.
+  - Increased atmospheric treatment (dust readability, haze warmth, bloom/contrast envelope).
+  - Added stronger stadium-exit read (warm portal, horizon light band, pitch hint planes).
+  - Reduced hero overlay dominance and shifted hero typography/CTA treatment to warmer grading so the 3D opening reads first.
+  - Updated visual baselines after look changes.
+- Validation run:
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+  - `cmd /c npm run test:visual:update`
+- Remaining / next:
+  - If needed, do one more art pass to push overlay even lighter and expose more central tunnel in first paint.
+
+## 2026-02-26
+- Milestones touched: 2.5 (curated free-asset replacement pass).
+- Skills used (or "none"): `threejs-textures`.
+- Completed:
+  - Replaced first-pass synthetic tunnel maps with curated ambientCG CC0 material packs:
+    - `Concrete013` (tunnel wall set, 2k + 1k)
+    - `Concrete047A` (tunnel floor set, 2k + 1k)
+  - Upgraded `scripts/fetch-free-polish-assets.py` to fetch ambientCG packs via `ambientcg.com/get` and extract canonical map sets from ZIP archives.
+  - Replaced several generated placeholders with curated free source-driven derivatives (smoke/sprite/noise/lensflare/caustic from Three.js examples):
+    - dust sprites, glow sprite, confetti atlas, light streak, film grain, haze plates, and grime atlas.
+  - Switched tunnel HDR source to `san_giuseppe_bridge_2k.hdr` and kept transition HDR from `venice_sunset_1k.hdr`.
+  - Regenerated `Assets.json` after new source additions.
+- Validation run:
+  - `python scripts/fetch-free-polish-assets.py`
+  - `powershell -ExecutionPolicy Bypass -File scripts/generate-assets-json.ps1`
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+  - `cmd /c npm run test:visual:update`
+- Remaining / next:
+  - Run visual regression snapshot refresh (`cmd /c npm run test:visual:update`) and compare deltas before sign-off.
+  - Optionally curate a second ambientCG/Poly-Haven HDR pair if you want a different mood target.
+
+## 2026-02-26
+- Milestones touched: 2.5 (free/open asset sourcing and runtime population).
+- Skills used (or "none"): `threejs-textures`.
+- Completed:
+  - Added repeatable fetch/generate pipeline script: `scripts/fetch-free-polish-assets.py`.
+  - Downloaded free/open source textures, sprites, and HDRIs from the Three.js examples texture library into `Assets/free-open/downloads/`.
+  - Generated derivative runtime-ready hero/transition assets (PBR maps, overlays, masks, LUT, sprites) and stored source copies under `Assets/free-open/generated/`.
+  - Populated `src/assets/` with runtime files matching the manifest keys, including tunnel/floor texture sets and `_1k` variants used by low/mid profiles.
+  - Added source/license traceability note at `Assets/free-open/SOURCES.md`.
+  - Regenerated `Assets.json` after asset additions.
+- Validation run:
+  - `python scripts/fetch-free-polish-assets.py`
+  - `powershell -ExecutionPolicy Bypass -File scripts/generate-assets-json.ps1`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Review the newly sourced art direction in-browser and replace any placeholder/generated assets that do not meet final quality bar.
+  - Optionally move runtime asset URLs to bundled imports (instead of `/src/...` paths) for stricter production-path reliability.
+
+## 2026-02-26
+- Milestones touched: 2.5 (asset catalog update).
+- Skills used (or "none"): none.
+- Completed:
+  - Added `Assets/42870aad-d83e-433d-9283-11a8b0016ef3.png` to canonical catalog.
+  - Regenerated `Assets.json` using `scripts/generate-assets-json.ps1`.
+  - Confirmed the new entry is tagged as `reference` and included in `lookup.miscReference`.
+- Validation run:
+  - `powershell -ExecutionPolicy Bypass -File scripts/generate-assets-json.ps1`
+- Remaining / next:
+  - Continue sourcing and adding remaining free/open hero-transition polish assets listed in the asset manifest.
+
+## 2026-02-26
+- Milestones touched: 1-2 (Polish V2 pass), 2.5 (new completion section).
+- Skills used (or "none"): `gsap-scrolltrigger`, `threejs-lighting`, `threejs-textures`, `threejs-postprocessing`.
+- Completed:
+  - Added beat/spec + quality envelope config files (`src/config/heroTransitionBeats.ts`, `src/config/visualProfiles.ts`).
+  - Extended `useDeviceTier` with `allowPostFx`, `textureSet`, and `particleCap`.
+  - Added typed runtime asset manifest (`src/three/assets/assetManifest.ts`) and optional texture loader hook.
+  - Refactored `HeroScene` and `TransitionScene` to consume `visualProfile` and beat-driven choreography.
+  - Added post-processing wrapper `ScenePostFx` and wired desktop/high-tier gating in `PageShell`.
+  - Added DOM beat metadata (`data-hero-beat`, `data-transition-beat`) and overlay polish in Hero/Transition sections.
+  - Added runtime asset structure under `src/assets/` with placeholders and onboarding checklist.
+  - Added visual regression suite scaffold (`tests/visual/hero-transition.visual.spec.ts`) and npm scripts for visual snapshot workflows.
+  - Expanded smoke coverage for beat progression and explicit post-FX disabled behavior in reduced-motion/mobile paths.
+  - Marked new Milestone 2.5 polish checklist complete in `MILESTONES.md`.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Add free/open hero/transition runtime assets from the manifest list and regenerate `Assets.json`.
+  - Capture baseline visual snapshots with `cmd /c npm run test:visual:update`.
+  - Run visual/perf sign-off pass before enabling polish flag by default in production.
+
+## 2026-02-26
+- Milestones touched: 4 (Slice C implementation + milestone acceptance sign-off).
+- Skills used (or "none"): `gsap-scrolltrigger`.
+- Completed:
+  - Added non-reduced-motion staggered entry reveal for featured story cards in `FeaturedStoriesSection`.
+  - Added touch/pointer highlight parity and explicit section reveal mode markers (`data-entry-motion`, `data-entry-reveal`).
+  - Improved keyboard visibility with stronger featured card focus-within outline treatment.
+  - Enforced reduced-motion static reveal path for featured cards (no entry tween, no card lift on hover/focus).
+  - Expanded smoke coverage for sequential keyboard focus order and reduced-motion static reveal assertions.
+  - Marked Milestone 4 Slice C and acceptance criteria complete in `MILESTONES.md`.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Start Milestone 5 Slice A (`networkShows.json` + DOM tile grid + placeholder loading state).
+
+## 2026-02-25
+- Milestones touched: 4 (Slice A + Slice B implementation).
+- Skills used (or "none"): `gsap-scrolltrigger`, `threejs-fundamentals`.
+- Completed:
+  - Added featured stories data source (`src/data/featuredStories.json`, `src/data/featuredStories.ts`).
+  - Implemented `FeaturedStoriesSection` with DOM-first story cards, categories, and `Read Story` CTAs.
+  - Wired section into `PageShell` and promoted placeholder handoff to Milestone 5.
+  - Implemented `FeaturedStoriesScene` constellation atmosphere with low-cost points/lines.
+  - Synced hover/focus card highlight state to scene emphasis and added low-tier static fallback.
+  - Expanded smoke tests for featured card rendering, CTA routes, highlight state, and updated handoff expectation.
+  - Marked Milestone 4 Slice A/B checklist items complete in `MILESTONES.md`.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Milestone 4 Slice C: add reduced-motion-safe entry reveals and final accessibility polish checks.
+  - Milestone 4 acceptance sign-off sweep (readability, interaction consistency, mobile targeting).
+
 ## 2026-02-25
 - Milestones touched: 3 (acceptance sign-off + asset inclusion).
 - Skills used (or "none"): `playwright`.

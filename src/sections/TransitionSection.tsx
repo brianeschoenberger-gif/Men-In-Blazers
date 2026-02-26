@@ -7,6 +7,7 @@ import {
 } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { TRANSITION_BEATS, getCurrentBeat } from '../config/heroTransitionBeats'
 import { Section } from '../components/layout/Section'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -23,6 +24,7 @@ export function TransitionSection({
   const sectionRef = useRef<HTMLElement>(null)
   const [progress, setProgress] = useState(0)
   const clamped = Math.min(Math.max(progress, 0), 1)
+  const beat = useMemo(() => getCurrentBeat(TRANSITION_BEATS, clamped), [clamped])
 
   const energyMeter = useMemo(() => {
     if (reducedMotion) {
@@ -36,8 +38,14 @@ export function TransitionSection({
   }, [clamped, reducedMotion])
 
   const meterStyle = useMemo(
-    () => ({ '--energy-level': energyMeter.toFixed(3) }) as CSSProperties,
-    [energyMeter],
+    () =>
+      ({
+        '--energy-level': energyMeter.toFixed(3),
+        '--transition-overlay-opacity': reducedMotion
+          ? '0.74'
+          : (0.56 + clamped * 0.18).toFixed(3),
+      }) as CSSProperties,
+    [clamped, energyMeter, reducedMotion],
   )
 
   useLayoutEffect(() => {
@@ -76,12 +84,17 @@ export function TransitionSection({
 
   return (
     <Section id="transition" className="section--transition" ref={sectionRef}>
-      <div className="transition-overlay" style={meterStyle}>
+      <div
+        className="transition-overlay"
+        style={meterStyle}
+        data-transition-beat={beat.id}
+      >
         <p className="eyebrow">Transition</p>
         <h2 className="transition-title">Crowd Energy Surge</h2>
         <p className="transition-subtitle">
           Intensity rises, then settles into a calm ambient handoff.
         </p>
+        <p className="transition-beat-label">{beat.label}</p>
         <div className="transition-meter" aria-hidden>
           <span className="transition-meter__bar" />
           <span className="transition-meter__bar" />

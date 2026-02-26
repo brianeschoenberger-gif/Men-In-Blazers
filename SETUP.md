@@ -67,7 +67,18 @@ Persist for future terminals:
 setx OPENAI_API_KEY "YOUR_KEY_HERE"
 ```
 
+Install Python deps for image generation CLI:
+
+```powershell
+python -m pip install openai pillow
+```
+
+Quick imagegen health check:
+
+```powershell
+python scripts/image_gen.py generate --prompt "health check" --dry-run
+```
+
 ## Windows Notes
 - In this environment, `npm` can be blocked by PowerShell execution policy.
 - Use `cmd /c npm ...` and `cmd /c npx ...` if direct `npm` fails.
-

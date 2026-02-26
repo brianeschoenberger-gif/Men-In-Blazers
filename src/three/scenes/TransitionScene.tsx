@@ -1,45 +1,93 @@
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
-import { Fog, MathUtils } from 'three'
+import { AdditiveBlending, Fog, MathUtils } from 'three'
+import {
+  TRANSITION_BEATS,
+  STYLE_TOKENS,
+  getCurrentBeat,
+} from '../../config/heroTransitionBeats'
+import type { VisualProfile } from '../../config/visualProfiles'
+import { getAssetPath } from '../assets/assetManifest'
+import { ConfettiParticles } from '../effects/ConfettiParticles'
 import { EnergyParticles } from '../effects/EnergyParticles'
 import { LightStreaks } from '../effects/LightStreaks'
 import { WaveformLines } from '../effects/WaveformLines'
+import { useOptionalTexture } from '../hooks/useOptionalTexture'
 
 type TransitionSceneProps = {
   progress: number
   reducedMotion: boolean
-  particleMultiplier: number
+  visualProfile: VisualProfile
 }
 
-function getSurgeIntensity(progress: number, reducedMotion: boolean) {
+function getControlledIntensity(
+  progress: number,
+  reducedMotion: boolean,
+  profile: VisualProfile,
+) {
   const clamped = MathUtils.clamp(progress, 0, 1)
 
   if (reducedMotion) {
-    return MathUtils.lerp(0.08, 0.24, MathUtils.smoothstep(clamped, 0.1, 0.86))
+    return MathUtils.lerp(
+      profile.transition.calmFloor,
+      profile.transition.settleTarget,
+      MathUtils.smoothstep(clamped, 0.12, 0.88),
+    )
   }
 
-  if (clamped <= 0.64) {
-    return MathUtils.smoothstep(clamped, 0.02, 0.64)
+  if (clamped <= profile.transition.riseEnd) {
+    return MathUtils.smoothstep(
+      clamped,
+      profile.transition.riseStart,
+      profile.transition.riseEnd,
+    )
   }
 
-  const settle = MathUtils.smoothstep(clamped, 0.64, 1)
-  return MathUtils.lerp(1, 0.36, settle)
+  if (clamped <= profile.transition.peakHoldEnd) {
+    return MathUtils.lerp(
+      0.92,
+      1,
+      MathUtils.smoothstep(clamped, profile.transition.riseEnd, profile.transition.peakHoldEnd),
+    )
+  }
+
+  return MathUtils.lerp(
+    1,
+    profile.transition.settleTarget,
+    MathUtils.smoothstep(clamped, profile.transition.peakHoldEnd, profile.transition.settleEnd),
+  )
 }
 
 export function TransitionScene({
   progress,
   reducedMotion,
-  particleMultiplier,
+  visualProfile,
 }: TransitionSceneProps) {
   const { camera, scene } = useThree()
-  const intensity = getSurgeIntensity(progress, reducedMotion)
+
+  const lightStreakTexture = useOptionalTexture(getAssetPath('light_streak'))
+  const confettiTexture = useOptionalTexture(getAssetPath('confetti_atlas'))
+  const waveformMask = useOptionalTexture(getAssetPath('waveform_mask'))
+  const radialBurstMask = useOptionalTexture(getAssetPath('radial_burst_mask'))
+  const noiseTile = useOptionalTexture(getAssetPath('noise_tile'))
+
+  const clampedProgress = MathUtils.clamp(progress, 0, 1)
+  const beat = getCurrentBeat(TRANSITION_BEATS, clampedProgress)
+  const baseIntensity = getControlledIntensity(progress, reducedMotion, visualProfile)
+  const intensity = reducedMotion
+    ? baseIntensity
+    : MathUtils.clamp(baseIntensity * visualProfile.transition.beatScale[beat.id], 0, 1)
   const calmResolve = reducedMotion
     ? MathUtils.smoothstep(progress, 0.72, 1)
-    : MathUtils.smoothstep(progress, 0.78, 1)
+    : MathUtils.smoothstep(progress, 0.8, 1)
+
+  const ambientFloorOpacity = reducedMotion
+    ? 0.08
+    : MathUtils.lerp(0.1, 0.2, calmResolve)
 
   useEffect(() => {
     const previousFog = scene.fog
-    scene.fog = new Fog('#050a14', 6, 58)
+    scene.fog = new Fog('#050a14', 5.6, 64)
     return () => {
       scene.fog = previousFog
     }
@@ -55,7 +103,7 @@ export function TransitionScene({
     )
     camera.position.z = MathUtils.damp(
       camera.position.z,
-      reducedMotion ? 5.8 : 6.3 - intensity * 0.7,
+      reducedMotion ? 5.8 : 6.35 - intensity * 0.8,
       2.4,
       delta,
     )
@@ -64,48 +112,83 @@ export function TransitionScene({
 
   return (
     <group>
-      <ambientLight intensity={0.3 + intensity * 0.24} />
+      <ambientLight intensity={0.28 + intensity * 0.22} />
       <pointLight
         position={[0, 1.6, 4]}
         intensity={0.74 + intensity * 1.5}
-        color="#8dd3ff"
+        color={STYLE_TOKENS.hero.portalColor}
       />
       <pointLight
         position={[-3.5, -1.2, -10]}
-        intensity={0.4 + intensity * 1.1}
-        color="#7ab7ff"
+        intensity={0.4 + intensity * 1.16}
+        color={STYLE_TOKENS.transition.streakColor}
       />
       <pointLight
         position={[2.8, 0.5, -16]}
-        intensity={0.15 + calmResolve * 0.45}
-        color="#8fc2ff"
+        intensity={0.16 + calmResolve * 0.52}
+        color={STYLE_TOKENS.transition.settleColor}
       />
 
       <EnergyParticles
         intensity={intensity}
-        particleMultiplier={particleMultiplier}
+        particleMultiplier={visualProfile.particleMultiplier}
+        particleCap={Math.floor(visualProfile.particleCap * 0.74)}
         reducedMotion={reducedMotion}
+        mapTexture={confettiTexture}
+        color="#8fd0ff"
       />
-      <LightStreaks intensity={intensity} reducedMotion={reducedMotion} />
-      <WaveformLines intensity={intensity} reducedMotion={reducedMotion} />
+      <ConfettiParticles
+        intensity={intensity}
+        particleMultiplier={visualProfile.particleMultiplier}
+        particleCap={Math.floor(visualProfile.particleCap * 0.55)}
+        reducedMotion={reducedMotion}
+        mapTexture={confettiTexture}
+      />
+      <LightStreaks
+        intensity={intensity}
+        reducedMotion={reducedMotion}
+        mapTexture={lightStreakTexture}
+      />
+      <WaveformLines
+        intensity={intensity}
+        reducedMotion={reducedMotion}
+        maskTexture={waveformMask}
+      />
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.8, -12]}>
-        <ringGeometry args={[2.5, 4 + intensity * 1.6, 56]} />
+        <ringGeometry args={[2.5, 4 + intensity * 1.7, 56]} />
         <meshBasicMaterial
-          color="#5fb7ff"
+          color={STYLE_TOKENS.transition.surgeColor}
+          map={radialBurstMask ?? undefined}
+          alphaMap={radialBurstMask ?? undefined}
           transparent
-          opacity={reducedMotion ? 0.1 : 0.12 + intensity * 0.2}
+          opacity={reducedMotion ? 0.1 : 0.12 + intensity * 0.24}
+          blending={AdditiveBlending}
+          depthWrite={false}
         />
       </mesh>
 
       <mesh position={[0, -0.35, -18]}>
         <planeGeometry args={[12, 6]} />
         <meshBasicMaterial
-          color="#66bbff"
+          color={STYLE_TOKENS.transition.settleColor}
+          map={noiseTile ?? undefined}
           transparent
-          opacity={reducedMotion ? 0.06 : calmResolve * 0.16}
+          opacity={reducedMotion ? 0.06 : calmResolve * 0.18}
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+
+      <mesh position={[0, -1.6, -14]}>
+        <planeGeometry args={[16, 5.6]} />
+        <meshBasicMaterial
+          color="#4a7eb5"
+          transparent
+          opacity={ambientFloorOpacity}
         />
       </mesh>
     </group>
   )
 }
+

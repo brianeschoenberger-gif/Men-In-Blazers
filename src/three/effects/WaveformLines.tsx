@@ -1,10 +1,17 @@
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import { MathUtils, type Mesh, type MeshBasicMaterial } from 'three'
+import {
+  AdditiveBlending,
+  MathUtils,
+  type Mesh,
+  type MeshBasicMaterial,
+  type Texture,
+} from 'three'
 
 type WaveformLinesProps = {
   intensity: number
   reducedMotion: boolean
+  maskTexture?: Texture | null
 }
 
 type WaveLine = {
@@ -14,7 +21,11 @@ type WaveLine = {
   phase: number
 }
 
-export function WaveformLines({ intensity, reducedMotion }: WaveformLinesProps) {
+export function WaveformLines({
+  intensity,
+  reducedMotion,
+  maskTexture,
+}: WaveformLinesProps) {
   const lineRefs = useRef<Mesh[]>([])
   const lines = useMemo<WaveLine[]>(
     () =>
@@ -73,7 +84,16 @@ export function WaveformLines({ intensity, reducedMotion }: WaveformLinesProps) 
           }}
         >
           <planeGeometry args={[line.width, 0.03]} />
-          <meshBasicMaterial color="#8fcbff" transparent opacity={0.08} />
+          <meshBasicMaterial
+            color="#8fcbff"
+            transparent
+            opacity={0.08}
+            map={maskTexture ?? undefined}
+            alphaMap={maskTexture ?? undefined}
+            alphaTest={maskTexture ? 0.02 : 0}
+            blending={AdditiveBlending}
+            depthWrite={false}
+          />
         </mesh>
       ))}
     </group>

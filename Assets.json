@@ -1,6 +1,6 @@
 {
     "version":  1,
-    "generatedAtUtc":  "2026-02-26T04:04:17Z",
+    "generatedAtUtc":  "2026-02-26T05:44:21Z",
     "root":  "Assets",
     "notes":  [
                   "This file is the canonical asset catalog for the repository.",
@@ -59,6 +59,18 @@
                                 ]
                    },
                    {
+                       "id":  "42870aad_d83e_433d_9283_11a8b0016ef3",
+                       "filename":  "42870aad-d83e-433d-9283-11a8b0016ef3.png",
+                       "sourcePath":  "Assets/42870aad-d83e-433d-9283-11a8b0016ef3.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  1930056,
+                       "sha256":  "6dcbb8e5b40d1adb124ce0bcd4d714e36c6b71c2df9ab93e52fdce994ce4cd0e",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
                        "id":  "7ff00b706188f52610c3434feb483273d9383ebf",
                        "filename":  "7ff00b706188f52610c3434feb483273d9383ebf.webp",
                        "sourcePath":  "Assets/7ff00b706188f52610c3434feb483273d9383ebf.webp",
@@ -92,6 +104,738 @@
                        "sha256":  "2bb5149537ce0dffdc8dad87314103d24ab7f989ebec3f385671d0f5e2c94e0c",
                        "tags":  [
                                     "generated"
+                                ]
+                   },
+                   {
+                       "id":  "ball",
+                       "filename":  "ball.png",
+                       "sourcePath":  "Assets/free-open/downloads/ball.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  3983,
+                       "sha256":  "6dd1bf340dc56432cf44feeff5d79480f9dcd3397fd1872f16c98c0e56af7f3b",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "blossom",
+                       "filename":  "blossom.png",
+                       "sourcePath":  "Assets/free-open/downloads/blossom.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  26330,
+                       "sha256":  "d31317ea0e6a064cdfe804d2eb57f286f0e29f83a3ed06267672f8602327485f",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "brick_bump",
+                       "filename":  "brick_bump.jpg",
+                       "sourcePath":  "Assets/free-open/downloads/brick_bump.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  803741,
+                       "sha256":  "fad2311729a8f98c2fdcb6d9442e8c2b70c97c169eb653005e5554680fa18a53",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "brick_diffuse",
+                       "filename":  "brick_diffuse.jpg",
+                       "sourcePath":  "Assets/free-open/downloads/brick_diffuse.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  1090649,
+                       "sha256":  "b49b0ab13aa4455cc7348cb4bfbbffcb344f2f81b17121eb1e57bcd3b387febe",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "brick_roughness",
+                       "filename":  "brick_roughness.jpg",
+                       "sourcePath":  "Assets/free-open/downloads/brick_roughness.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  234715,
+                       "sha256":  "6285e8504d5680ff4afbd4c4f5ca81f8a56e970a6e2bc69040e8dff77e078e37",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "caustic_free",
+                       "filename":  "caustic_free.jpg",
+                       "sourcePath":  "Assets/free-open/downloads/caustic_free.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  79046,
+                       "sha256":  "79c32285c5a876716c4d39ddb01d3d4ac949ded1e73e401e48a8620af2b2331a",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "concrete013_1k_jpg",
+                       "filename":  "Concrete013_1K-JPG.zip",
+                       "sourcePath":  "Assets/free-open/downloads/Concrete013_1K-JPG.zip",
+                       "type":  "file",
+                       "extension":  ".zip",
+                       "sizeBytes":  5140371,
+                       "sha256":  "427ea8e5046c28f5dc9657559d3ebd1cd4de9acd12d4c69af560035a4224a52f",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "concrete013_2k_jpg",
+                       "filename":  "Concrete013_2K-JPG.zip",
+                       "sourcePath":  "Assets/free-open/downloads/Concrete013_2K-JPG.zip",
+                       "type":  "file",
+                       "extension":  ".zip",
+                       "sizeBytes":  15906934,
+                       "sha256":  "8c5f350480abd73b4a27a1b2ea4b02ec08d1444598c0cf51ac2a17e1fb297b76",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "concrete047a_1k_jpg",
+                       "filename":  "Concrete047A_1K-JPG.zip",
+                       "sourcePath":  "Assets/free-open/downloads/Concrete047A_1K-JPG.zip",
+                       "type":  "file",
+                       "extension":  ".zip",
+                       "sizeBytes":  8614118,
+                       "sha256":  "94e04bdf80c4fa377f8c736183963cdd911131a26673e2462495e45bf679102f",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "concrete047a_2k_jpg",
+                       "filename":  "Concrete047A_2K-JPG.zip",
+                       "sourcePath":  "Assets/free-open/downloads/Concrete047A_2K-JPG.zip",
+                       "type":  "file",
+                       "extension":  ".zip",
+                       "sizeBytes":  32918448,
+                       "sha256":  "70a9be4b8107d641cbcb9ca3e10b09592c5f95fb8effb4305b1fe2990fac71cc",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "disc",
+                       "filename":  "disc.png",
+                       "sourcePath":  "Assets/free-open/downloads/disc.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  1399,
+                       "sha256":  "5429d0ce673fe08a0dc8bc852728ebd624bf8677650fa74f2c98c861e0de3721",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "hardwood2_bump",
+                       "filename":  "hardwood2_bump.jpg",
+                       "sourcePath":  "Assets/free-open/downloads/hardwood2_bump.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  118085,
+                       "sha256":  "0f07254a3eb31274b7f7cc71968b74a5a39a799d33e8b290c4b8dca6ce43654d",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "hardwood2_diffuse",
+                       "filename":  "hardwood2_diffuse.jpg",
+                       "sourcePath":  "Assets/free-open/downloads/hardwood2_diffuse.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  413689,
+                       "sha256":  "3986fe3bd7d3c24b18e7da17ae72bbef9385dbc355c931c52a04dbfe1412c802",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "hardwood2_roughness",
+                       "filename":  "hardwood2_roughness.jpg",
+                       "sourcePath":  "Assets/free-open/downloads/hardwood2_roughness.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  146048,
+                       "sha256":  "bdce31ae1138fd110703f5fb37a4979b4b03cd6a057f58897c16d27839d7d17b",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "lensflare0",
+                       "filename":  "lensflare0.png",
+                       "sourcePath":  "Assets/free-open/downloads/lensflare0.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  78758,
+                       "sha256":  "cc6aae5d2f1868280211a2f102c8b3faefc441e588afba54f7d5968cbc9403e3",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "noise",
+                       "filename":  "noise.png",
+                       "sourcePath":  "Assets/free-open/downloads/noise.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  247564,
+                       "sha256":  "303b58e9577f9e2711ab4c53a0b71ff29adc419e1f9b9559d15304efdfffb839",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "pedestrian_overpass_1k",
+                       "filename":  "pedestrian_overpass_1k.hdr",
+                       "sourcePath":  "Assets/free-open/downloads/pedestrian_overpass_1k.hdr",
+                       "type":  "file",
+                       "extension":  ".hdr",
+                       "sizeBytes":  1513980,
+                       "sha256":  "3d2c4068676cfead5dce9a12896cf1ebcac4e97914938e3c2987b70cad4e4c4a",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "san_giuseppe_bridge_2k",
+                       "filename":  "san_giuseppe_bridge_2k.hdr",
+                       "sourcePath":  "Assets/free-open/downloads/san_giuseppe_bridge_2k.hdr",
+                       "type":  "file",
+                       "extension":  ".hdr",
+                       "sizeBytes":  6005059,
+                       "sha256":  "2275cdd6a5f6ed26056273c08d7d4b6fc392164593137e6f25deea8170ca7c2b",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "smoke1",
+                       "filename":  "smoke1.png",
+                       "sourcePath":  "Assets/free-open/downloads/smoke1.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  167394,
+                       "sha256":  "ebf570d0b0466290fef450ecc6e927aa2b4416a48fdc01da69d3bff77e775183",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "snowflake1",
+                       "filename":  "snowflake1.png",
+                       "sourcePath":  "Assets/free-open/downloads/snowflake1.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  861,
+                       "sha256":  "ace754c983f00e5bdcc989b392d8d78d1ae7dbc41d5f03a9a17bfe985c54165a",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "spark1",
+                       "filename":  "spark1.png",
+                       "sourcePath":  "Assets/free-open/downloads/spark1.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  1788,
+                       "sha256":  "f79341aaf44ea6c1a912cf5b29e8bd1fc045376f77b8bde8637e07b179a7d67e",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "stadium_crowd_pixabay_3638371_1280",
+                       "filename":  "stadium_crowd_pixabay_3638371_1280.jpg",
+                       "sourcePath":  "Assets/free-open/downloads/stadium_crowd_pixabay_3638371_1280.jpg",
+                       "type":  "image",
+                       "extension":  ".jpg",
+                       "sizeBytes":  397963,
+                       "sha256":  "402700a30fb8ec71754563865d3358c8f386626566b18ac1baf0702cdd2f0b9d",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "venice_sunset_1k",
+                       "filename":  "venice_sunset_1k.hdr",
+                       "sourcePath":  "Assets/free-open/downloads/venice_sunset_1k.hdr",
+                       "type":  "file",
+                       "extension":  ".hdr",
+                       "sizeBytes":  1397783,
+                       "sha256":  "0e72ed46b5316cb5fb67fc81ff85b024a09146fd89ef3811a8d2299647ada118",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "env_stadium_night_2k",
+                       "filename":  "env_stadium_night_2k.hdr",
+                       "sourcePath":  "Assets/free-open/generated/hdr/env_stadium_night_2k.hdr",
+                       "type":  "file",
+                       "extension":  ".hdr",
+                       "sizeBytes":  1397783,
+                       "sha256":  "0e72ed46b5316cb5fb67fc81ff85b024a09146fd89ef3811a8d2299647ada118",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "env_tunnel_2k",
+                       "filename":  "env_tunnel_2k.hdr",
+                       "sourcePath":  "Assets/free-open/generated/hdr/env_tunnel_2k.hdr",
+                       "type":  "file",
+                       "extension":  ".hdr",
+                       "sizeBytes":  6005059,
+                       "sha256":  "2275cdd6a5f6ed26056273c08d7d4b6fc392164593137e6f25deea8170ca7c2b",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "cool_cinematic",
+                       "filename":  "cool_cinematic.png",
+                       "sourcePath":  "Assets/free-open/generated/luts/cool_cinematic.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  1732,
+                       "sha256":  "7c1f52fe918bc8ac9ca9c5bc6feac084b2a17fb23e29988e2bac3949aa73a326",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "tunnel",
+                       "filename":  "tunnel.glb",
+                       "sourcePath":  "Assets/free-open/generated/models/tunnel.glb",
+                       "type":  "file",
+                       "extension":  ".glb",
+                       "sizeBytes":  5518340,
+                       "sha256":  "27339dfcf2253a1ca20fc71e249cdcaf2c748f93ac8615dca2c33f920cfa2c88",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "film_grain",
+                       "filename":  "film_grain.webp",
+                       "sourcePath":  "Assets/free-open/generated/overlays/film_grain.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  545544,
+                       "sha256":  "dcdba52c3aad5d51bcae9e74b9785888b2f7f8750f509a9acaa3a713c929305c",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "lens_dirt",
+                       "filename":  "lens_dirt.webp",
+                       "sourcePath":  "Assets/free-open/generated/overlays/lens_dirt.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  14918,
+                       "sha256":  "30b0da19992367a8cd53a8dd70e847298f6441ca0eab91b6f47dbe483e602ace",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "scanline",
+                       "filename":  "scanline.webp",
+                       "sourcePath":  "Assets/free-open/generated/overlays/scanline.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  4110,
+                       "sha256":  "e889ff444aa878d6740df8cb189fcdfd6aa629d49cda57025013213176c0c0d5",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "vignette",
+                       "filename":  "vignette.webp",
+                       "sourcePath":  "Assets/free-open/generated/overlays/vignette.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  7518,
+                       "sha256":  "79afcfd4b0a43ea423a2581b33941b44b201844eff282a706b6f194c68319bad",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "confetti_atlas",
+                       "filename":  "confetti_atlas.png",
+                       "sourcePath":  "Assets/free-open/generated/sprites/confetti_atlas.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  317562,
+                       "sha256":  "6854250dd763e262f41b2cbfe97d5446046511c2cb34e21a21efb5d386b91f49",
+                       "tags":  [
+                                    "transition"
+                                ]
+                   },
+                   {
+                       "id":  "dust_sharp",
+                       "filename":  "dust_sharp.png",
+                       "sourcePath":  "Assets/free-open/generated/sprites/dust_sharp.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  17305,
+                       "sha256":  "8ce77da700ae7cd5cbc0fdfebfdef381089a08d93afd6cf71e8217d986ef2625",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "dust_soft",
+                       "filename":  "dust_soft.png",
+                       "sourcePath":  "Assets/free-open/generated/sprites/dust_soft.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  56064,
+                       "sha256":  "b1ee89ebc58afd58f33d3054feb93c5a13484c333de75bcc1a648df2de839404",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "glow_soft",
+                       "filename":  "glow_soft.png",
+                       "sourcePath":  "Assets/free-open/generated/sprites/glow_soft.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  85156,
+                       "sha256":  "914fe5464c57d740736dc29904cf51b1913cd204dc6e4603b7efcee4cecf18e2",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "light_streak",
+                       "filename":  "light_streak.png",
+                       "sourcePath":  "Assets/free-open/generated/sprites/light_streak.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  32943,
+                       "sha256":  "683c67069d438cdbe0fc5860ea2f20ba393604cd4be340c714468650a895de00",
+                       "tags":  [
+                                    "transition"
+                                ]
+                   },
+                   {
+                       "id":  "haze_a",
+                       "filename":  "haze_a.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/atmosphere/haze_a.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  18816,
+                       "sha256":  "91c6825004965a838f6c3c874144ff2fe32a6590351a394b66a3bf2e7b5421b0",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "haze_b",
+                       "filename":  "haze_b.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/atmosphere/haze_b.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  50366,
+                       "sha256":  "b0a6deee14ad0ecf5e4c2ab7bbd40a5e5d8a7052f6097dc4088a092e2c3ea8d8",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "grime_atlas",
+                       "filename":  "grime_atlas.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/decals/grime_atlas.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  73536,
+                       "sha256":  "43c1ae1db4fadb99e9717b83a0f0e2e434c4b0fdfc6baedb0253204bad680adc",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "stadium_crowd_plate",
+                       "filename":  "stadium_crowd_plate.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/hero/stadium_crowd_plate.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  47508,
+                       "sha256":  "36a40ac38bdb2ce0d2559b42f368e535216d316da047734c26288433c2f2a933",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "stadium_crowd_plate_1k",
+                       "filename":  "stadium_crowd_plate_1k.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/hero/stadium_crowd_plate_1k.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  19390,
+                       "sha256":  "89126d67d5d21ce0f89b3b9635d359ae916743669ab6490bf77c1b350896d7ae",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "ceiling_emissive_strip",
+                       "filename":  "ceiling_emissive_strip.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/lights/ceiling_emissive_strip.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  1062,
+                       "sha256":  "90a4b1a3934aec1d7640075adca912fa3b84b830aa8ea4cd237db572427cb16e",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "portal_gradient",
+                       "filename":  "portal_gradient.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/lights/portal_gradient.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  9946,
+                       "sha256":  "f88b44282fd37007f526ea051e817a750c3eed2b3b8a5670858fb47f0f61c1b7",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "noise_tile",
+                       "filename":  "noise_tile.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/noise/noise_tile.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  203084,
+                       "sha256":  "5c92dfa5fe7975cb143bd23fee81e2b5ab7a116823b6f9c77cb1f1e5004b4b63",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "radial_burst_mask",
+                       "filename":  "radial_burst_mask.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/transition/radial_burst_mask.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  30872,
+                       "sha256":  "e74b53fa9bfad5a0243f45fe58a3023e94a195ba6fd93cd62a100f20f78edf29",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "waveform_mask",
+                       "filename":  "waveform_mask.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/transition/waveform_mask.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  8042,
+                       "sha256":  "af6aa673713bdb4c727a8aface1813d1b7f590715d4e1315bbb4df841740e457",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "floor_albedo",
+                       "filename":  "floor_albedo.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/floor_albedo.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  2104736,
+                       "sha256":  "60babf6f4589198c68d58a59bb9a00703abe4c7e9a77f2716c5d57d67349b2bc",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "floor_albedo_1k",
+                       "filename":  "floor_albedo_1k.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/floor_albedo_1k.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  483234,
+                       "sha256":  "212cb1e246049ddcc0254e5db5c959f97224fcb16e2f5876b27e9955a9325ad4",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "floor_ao",
+                       "filename":  "floor_ao.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/floor_ao.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  1818476,
+                       "sha256":  "407fc44b1cd5857983714744c0e84e80f28c9583b158582c30007e2087872423",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "floor_normal",
+                       "filename":  "floor_normal.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/floor_normal.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  1993092,
+                       "sha256":  "47afe621cc37eefc5e8f0eed1c218c2f15ea6f6d514a41efd3bea663b742af69",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "floor_normal_1k",
+                       "filename":  "floor_normal_1k.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/floor_normal_1k.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  373242,
+                       "sha256":  "e95b898183ec6f95dec593879106a23fcfb29fa7b2b11c3ca9af1fef1afa19c7",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "floor_roughness",
+                       "filename":  "floor_roughness.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/floor_roughness.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  1719056,
+                       "sha256":  "f67107da29b9d156cbd7fa1ddd20de6a916d8b11e3d7cfd681abda3b71db0e4d",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "floor_roughness_1k",
+                       "filename":  "floor_roughness_1k.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/floor_roughness_1k.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  378760,
+                       "sha256":  "b9494e566894b0fa8b28089d6a667c02f1e14f42a8014b2a3cc9682c948cd410",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "wall_albedo",
+                       "filename":  "wall_albedo.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/wall_albedo.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  776920,
+                       "sha256":  "634dd961aeae0b0ddf403d09f56c86566276daebcc19bf4f9649ccc76aeb3e98",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "wall_albedo_1k",
+                       "filename":  "wall_albedo_1k.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/wall_albedo_1k.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  177042,
+                       "sha256":  "173cd27fa0505822a4de2e23379f4856e35c64a51d66eb2f29e06d62abc3f392",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "wall_ao",
+                       "filename":  "wall_ao.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/wall_ao.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  361534,
+                       "sha256":  "dc2c4c80122c5d606e792cbd826f62cab017b459161829fd65422fadac25ee2d",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "wall_normal",
+                       "filename":  "wall_normal.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/wall_normal.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  1070414,
+                       "sha256":  "966a127c4ebdd8c842341dedf95352ccf148b0b667ebbca16781ae817dcbae3a",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "wall_normal_1k",
+                       "filename":  "wall_normal_1k.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/wall_normal_1k.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  255176,
+                       "sha256":  "0a820f80809fde7e450a6584b12429eb68eda429abfddf21b1afa53dbdd5895b",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "wall_roughness",
+                       "filename":  "wall_roughness.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/wall_roughness.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  535088,
+                       "sha256":  "552a57724e1a04971805e6de718f5ff948caf056a16a0b60530ddf32429d5214",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "wall_roughness_1k",
+                       "filename":  "wall_roughness_1k.webp",
+                       "sourcePath":  "Assets/free-open/generated/textures/tunnel/wall_roughness_1k.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  98126,
+                       "sha256":  "10a679f797c4bbd49c75cb22de2e51edfeb8a02e09cf6cd301a5c98a3e4b1e4d",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "sources",
+                       "filename":  "SOURCES.md",
+                       "sourcePath":  "Assets/free-open/SOURCES.md",
+                       "type":  "file",
+                       "extension":  ".md",
+                       "sizeBytes":  864,
+                       "sha256":  "bbed8eb50bff3823f48e2e605a238e3996d6f4c697fad70fadf87539d6e8a796",
+                       "tags":  [
+                                    "reference"
                                 ]
                    },
                    {
@@ -140,14 +884,76 @@
                                          "20260225_1243_01kjb7hvpff0wa3y2484cm199p"
                                      ],
                    "transitionReference":  [
-                                               "20260225_1243_01kjb7hvpff0wa3y2484cm199p"
+                                               "20260225_1243_01kjb7hvpff0wa3y2484cm199p",
+                                               "confetti_atlas",
+                                               "light_streak"
                                            ],
                    "miscReference":  [
                                          "0517b0da23f30a6e3ea3d6d1696b1a1919734346",
                                          "25_26report_email",
+                                         "42870aad_d83e_433d_9283_11a8b0016ef3",
                                          "7ff00b706188f52610c3434feb483273d9383ebf",
                                          "bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy",
                                          "chatgpt_image_feb_25_2026_01_07_16_pm",
+                                         "ball",
+                                         "blossom",
+                                         "brick_bump",
+                                         "brick_diffuse",
+                                         "brick_roughness",
+                                         "caustic_free",
+                                         "concrete013_1k_jpg",
+                                         "concrete013_2k_jpg",
+                                         "concrete047a_1k_jpg",
+                                         "concrete047a_2k_jpg",
+                                         "disc",
+                                         "hardwood2_bump",
+                                         "hardwood2_diffuse",
+                                         "hardwood2_roughness",
+                                         "lensflare0",
+                                         "noise",
+                                         "pedestrian_overpass_1k",
+                                         "san_giuseppe_bridge_2k",
+                                         "smoke1",
+                                         "snowflake1",
+                                         "spark1",
+                                         "stadium_crowd_pixabay_3638371_1280",
+                                         "venice_sunset_1k",
+                                         "env_stadium_night_2k",
+                                         "env_tunnel_2k",
+                                         "cool_cinematic",
+                                         "tunnel",
+                                         "film_grain",
+                                         "lens_dirt",
+                                         "scanline",
+                                         "vignette",
+                                         "dust_sharp",
+                                         "dust_soft",
+                                         "glow_soft",
+                                         "haze_a",
+                                         "haze_b",
+                                         "grime_atlas",
+                                         "stadium_crowd_plate",
+                                         "stadium_crowd_plate_1k",
+                                         "ceiling_emissive_strip",
+                                         "portal_gradient",
+                                         "noise_tile",
+                                         "radial_burst_mask",
+                                         "waveform_mask",
+                                         "floor_albedo",
+                                         "floor_albedo_1k",
+                                         "floor_ao",
+                                         "floor_normal",
+                                         "floor_normal_1k",
+                                         "floor_roughness",
+                                         "floor_roughness_1k",
+                                         "wall_albedo",
+                                         "wall_albedo_1k",
+                                         "wall_ao",
+                                         "wall_normal",
+                                         "wall_normal_1k",
+                                         "wall_roughness",
+                                         "wall_roughness_1k",
+                                         "sources",
                                          "hq720",
                                          "meshy_ai_tunnel_to_the_field_0226040001_texture"
                                      ]

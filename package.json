@@ -8,12 +8,16 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:smoke": "playwright test tests/smoke/smoke.spec.ts"
+    "test:smoke": "playwright test tests/smoke/smoke.spec.ts",
+    "test:visual": "set PLAYWRIGHT_VISUAL=1&& playwright test tests/visual/hero-transition.visual.spec.ts",
+    "test:visual:update": "set PLAYWRIGHT_VISUAL=1&& playwright test tests/visual/hero-transition.visual.spec.ts --update-snapshots"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@react-three/postprocessing": "^3.0.4",
     "gsap": "^3.14.2",
+    "postprocessing": "^6.38.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "three": "^0.183.1"

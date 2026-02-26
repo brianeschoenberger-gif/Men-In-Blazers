@@ -38,6 +38,39 @@
 - [x] Reduced-motion + mobile fallback
 - [x] Smoke tests cover transition surge/settle, handoff visibility, reduced-motion calm path, and mobile low-tier fallback
 
+## Milestone 2.5 - Hero/Transition Polish V2 (Day 4-6)
+### Scope
+- [x] Raise Hero + Transition to premium cinematic quality while preserving DOM-first critical UI.
+- [x] Keep reduced-motion and low-tier/mobile fallback behavior stable.
+
+### Vertical Slice Plan
+- [x] Slice A: Visual spec + quality envelope
+  - [x] Add `src/config/heroTransitionBeats.ts` for H1-H5 / T1-T4 beat ranges + style tokens + technical budgets
+  - [x] Add `src/config/visualProfiles.ts` with per-tier quality profile and runtime resolution rules
+  - [x] Extend `useDeviceTier` with explicit post-FX and particle/texture envelope flags
+- [x] Slice B: Hero art direction pass
+  - [x] Upgrade Hero scene materials to support optional runtime texture sets with safe procedural fallback
+  - [x] Improve lighting hierarchy (practicals, fill, portal) and haze/dust layer treatment
+  - [x] Add beat-driven hero overlay metadata (`data-hero-beat`) for authored state transitions
+- [x] Slice C: Transition choreography pass
+  - [x] Replace surge curve with controlled premium ramp/hold/settle profile
+  - [x] Add layered energy stack (streaks, confetti/sparks, waveform, resolve ring)
+  - [x] Add beat-driven transition metadata (`data-transition-beat`) and calm resolve guarantees
+- [x] Slice D: Post-FX + asset pipeline scaffold
+  - [x] Add gated `ScenePostFx` wrapper (desktop/high-tier only; disabled on reduced-motion and low tier)
+  - [x] Add typed asset manifest `src/three/assets/assetManifest.ts`
+  - [x] Add `src/assets/` runtime structure + placeholder brand assets + runtime asset checklist
+- [x] Slice E: QA hardening
+  - [x] Extend smoke tests for beat progression and post-FX fallback assertions
+  - [x] Add visual regression suite scaffold in `tests/visual/hero-transition.visual.spec.ts`
+  - [x] Add `test:visual` + `test:visual:update` scripts for checkpoint baselines
+
+### Acceptance Criteria
+- [x] Hero and transition maintain smooth pin/scrub behavior with no DOM CTA regressions
+- [x] Reduced-motion path remains calm and disables post-FX
+- [x] Mobile low-tier path disables post-FX and retains stable section readability
+- [x] Lint/build/smoke all pass after polish integration
+
 ## Milestone 3 - Tour Stops (Pinned US Map) (Day 5-7)
 ### Scope
 - [x] Build pinned US map section with interactive tour stop pins.
@@ -65,28 +98,28 @@
 
 ## Milestone 4 - Featured Stories (Constellation Discovery) (Day 7-9)
 ### Scope
-- [ ] Build discovery section with DOM story cards and subtle atmospheric constellation background.
-- [ ] Prioritize readability and keyboard navigation for cards.
+- [x] Build discovery section with DOM story cards and subtle atmospheric constellation background.
+- [x] Prioritize readability and keyboard navigation for cards.
 
 ### Vertical Slice Plan
-- [ ] Slice A: Data + card rail
-  - [ ] Add `src/data/featuredStories.json` (6-8 placeholder stories)
-  - [ ] Implement DOM card layout with title, dek, category, and "Read Story" CTA
-  - [ ] Add responsive layout behavior (desktop grid, mobile stack/rail)
-- [ ] Slice B: Constellation atmosphere
-  - [ ] Add low-cost background points + connective lines in Three scene
-  - [ ] Link hover/focus state to subtle glow pulse in background
-  - [ ] Ensure fallback to static background on low tier
-- [ ] Slice C: Motion and accessibility polish
-  - [ ] Staggered entry animation (non-reduced motion only)
-  - [ ] Focus order and visible focus styles across all cards
-  - [ ] Reduced-motion path uses static reveal only
+- [x] Slice A: Data + card rail
+  - [x] Add `src/data/featuredStories.json` (6-8 placeholder stories)
+  - [x] Implement DOM card layout with title, dek, category, and "Read Story" CTA
+  - [x] Add responsive layout behavior (desktop grid, mobile stack/rail)
+- [x] Slice B: Constellation atmosphere
+  - [x] Add low-cost background points + connective lines in Three scene
+  - [x] Link hover/focus state to subtle glow pulse in background
+  - [x] Ensure fallback to static background on low tier
+- [x] Slice C: Motion and accessibility polish
+  - [x] Staggered entry animation (non-reduced motion only)
+  - [x] Focus order and visible focus styles across all cards
+  - [x] Reduced-motion path uses static reveal only
 
 ### Acceptance Criteria
-- [ ] Story cards remain fully readable over visuals
-- [ ] Pointer, keyboard, and touch interactions are consistent
-- [ ] Mobile layout keeps CTA targets accessible
-- [ ] Smoke tests cover card rendering and at least one CTA path
+- [x] Story cards remain fully readable over visuals
+- [x] Pointer, keyboard, and touch interactions are consistent
+- [x] Mobile layout keeps CTA targets accessible
+- [x] Smoke tests cover card rendering and at least one CTA path
 
 ## Milestone 5 - Network Wall (Shows and Channels) (Day 9-11)
 ### Scope

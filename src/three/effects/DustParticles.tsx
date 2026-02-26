@@ -1,12 +1,14 @@
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import type { Points } from 'three'
+import type { Points, Texture } from 'three'
 
 type DustParticlesProps = {
   count: number
   reducedMotion: boolean
   opacity: number
   size: number
+  mapTexture?: Texture | null
+  color?: string
 }
 
 export function DustParticles({
@@ -14,6 +16,8 @@ export function DustParticles({
   reducedMotion,
   opacity,
   size,
+  mapTexture,
+  color = '#d9e2ff',
 }: DustParticlesProps) {
   const pointsRef = useRef<Points>(null)
 
@@ -45,11 +49,15 @@ export function DustParticles({
         />
       </bufferGeometry>
       <pointsMaterial
-        color="#d9e2ff"
+        color={color}
         opacity={opacity}
         transparent
         size={size}
         sizeAttenuation
+        map={mapTexture ?? undefined}
+        alphaMap={mapTexture ?? undefined}
+        alphaTest={mapTexture ? 0.03 : 0}
+        depthWrite={false}
       />
     </points>
   )

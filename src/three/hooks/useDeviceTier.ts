@@ -8,6 +8,9 @@ export type DeviceTierState = {
   dprCap: number
   particleMultiplier: number
   allowHeavyEffects: boolean
+  allowPostFx: boolean
+  textureSet: '1k' | '2k'
+  particleCap: number
 }
 
 type NavigatorWithMemory = Navigator & {
@@ -22,6 +25,9 @@ function detectDeviceTier(): DeviceTierState {
       dprCap: 1.5,
       particleMultiplier: 0.7,
       allowHeavyEffects: false,
+      allowPostFx: false,
+      textureSet: '1k',
+      particleCap: 650,
     }
   }
 
@@ -42,6 +48,9 @@ function detectDeviceTier(): DeviceTierState {
       dprCap: 1.25,
       particleMultiplier: 0.35,
       allowHeavyEffects: false,
+      allowPostFx: false,
+      textureSet: '1k',
+      particleCap: 320,
     }
   }
 
@@ -52,6 +61,9 @@ function detectDeviceTier(): DeviceTierState {
       dprCap: 2,
       particleMultiplier: 1,
       allowHeavyEffects: true,
+      allowPostFx: true,
+      textureSet: '2k',
+      particleCap: 1200,
     }
   }
 
@@ -61,6 +73,9 @@ function detectDeviceTier(): DeviceTierState {
     dprCap: 1.5,
     particleMultiplier: 0.65,
     allowHeavyEffects: false,
+    allowPostFx: false,
+    textureSet: '1k',
+    particleCap: 650,
   }
 }
 
@@ -77,4 +92,3 @@ export function useDeviceTier() {
 
   return deviceTier
 }
-

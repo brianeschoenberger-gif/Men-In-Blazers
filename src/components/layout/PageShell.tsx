@@ -1,12 +1,16 @@
 import { Suspense, lazy, useMemo, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { resolveVisualProfile } from '../../config/visualProfiles'
+import { ScenePostFx } from '../../three/postfx/ScenePostFx'
 import { HeroSection } from '../../sections/HeroSection'
 import { TransitionSection } from '../../sections/TransitionSection'
 import { TourStopsSection } from '../../sections/TourStopsSection'
+import { FeaturedStoriesSection } from '../../sections/FeaturedStoriesSection'
 import { PlaceholderNextSection } from '../../sections/PlaceholderNextSection'
 import { useReducedMotion } from '../../three/hooks/useReducedMotion'
 import { useDeviceTier } from '../../three/hooks/useDeviceTier'
 import { tourStops } from '../../data/tourStops'
+import { featuredStories } from '../../data/featuredStories'
 
 const HeroScene = lazy(async () => {
   const module = await import('../../three/scenes/HeroScene')
@@ -23,24 +27,93 @@ const TourStopsScene = lazy(async () => {
   return { default: module.TourStopsScene }
 })
 
+const FeaturedStoriesScene = lazy(async () => {
+  const module = await import('../../three/scenes/FeaturedStoriesScene')
+  return { default: module.FeaturedStoriesScene }
+})
+
 export function PageShell() {
   const reducedMotion = useReducedMotion()
   const deviceTier = useDeviceTier()
+  const polishV2Enabled =
+    import.meta.env.VITE_HERO_TRANSITION_POLISH_V2 !== 'false'
   const [heroProgress, setHeroProgress] = useState(0)
   const [transitionProgress, setTransitionProgress] = useState(0)
   const [tourStopsProgress, setTourStopsProgress] = useState(0)
+  const [featuredStoriesProgress, setFeaturedStoriesProgress] = useState(0)
   const [activeTourStopId, setActiveTourStopId] = useState<string>(
     tourStops[0]?.id ?? '',
   )
+  const [activeFeaturedStoryId, setActiveFeaturedStoryId] = useState<string>(
+    featuredStories[0]?.id ?? '',
+  )
 
   const pageProgress =
-    tourStopsProgress > 0.001
-      ? 0.7 + tourStopsProgress * 0.3
-      : transitionProgress > 0.001
-        ? 0.45 + transitionProgress * 0.25
-        : heroProgress * 0.45
+    featuredStoriesProgress > 0.001
+      ? 0.78 + featuredStoriesProgress * 0.22
+      : tourStopsProgress > 0.001
+        ? 0.54 + tourStopsProgress * 0.24
+        : transitionProgress > 0.001
+          ? 0.32 + transitionProgress * 0.22
+          : heroProgress * 0.32
+
+  const highlightedFeaturedIndex = Math.max(
+    0,
+    featuredStories.findIndex((story) => story.id === activeFeaturedStoryId),
+  )
+
+  const visualProfile = useMemo(
+    () =>
+      resolveVisualProfile({
+        tier: deviceTier.tier,
+        reducedMotion,
+        isMobile: deviceTier.isMobile,
+        polishV2Enabled,
+      }),
+    [deviceTier.isMobile, deviceTier.tier, polishV2Enabled, reducedMotion],
+  )
+
+  const activePhase =
+    featuredStoriesProgress > 0.001
+      ? 'featured'
+      : tourStopsProgress > 0.001
+        ? 'tour'
+        : transitionProgress > 0.001
+          ? 'transition'
+          : 'hero'
+
+  const postFxSection =
+    activePhase === 'hero' || activePhase === 'transition'
+      ? activePhase
+      : 'none'
+
+  const postFxProgress =
+    activePhase === 'hero'
+      ? heroProgress
+      : activePhase === 'transition'
+        ? transitionProgress
+        : 0
+
+  const postFxEnabled =
+    polishV2Enabled &&
+    !reducedMotion &&
+    deviceTier.allowPostFx &&
+    visualProfile.allowPostFx &&
+    postFxSection !== 'none'
 
   const activeScene = useMemo(() => {
+    if (featuredStoriesProgress > 0.001) {
+      return (
+        <FeaturedStoriesScene
+          progress={featuredStoriesProgress}
+          reducedMotion={reducedMotion}
+          storyCount={featuredStories.length}
+          highlightedIndex={highlightedFeaturedIndex}
+          deviceTier={deviceTier.tier}
+        />
+      )
+    }
+
     if (tourStopsProgress > 0.001) {
       return (
         <TourStopsScene
@@ -57,7 +130,7 @@ export function PageShell() {
         <TransitionScene
           progress={transitionProgress}
           reducedMotion={reducedMotion}
-          particleMultiplier={deviceTier.particleMultiplier}
+          visualProfile={visualProfile}
         />
       )
     }
@@ -68,18 +141,20 @@ export function PageShell() {
         reducedMotion={reducedMotion}
         deviceTier={deviceTier.tier}
         allowPointerDrift={!deviceTier.isMobile}
-        particleMultiplier={deviceTier.particleMultiplier}
+        visualProfile={visualProfile}
       />
     )
   }, [
     deviceTier.isMobile,
-    deviceTier.particleMultiplier,
     deviceTier.tier,
     activeTourStopId,
+    featuredStoriesProgress,
+    highlightedFeaturedIndex,
     heroProgress,
     reducedMotion,
     tourStopsProgress,
     transitionProgress,
+    visualProfile,
   ])
 
   return (
@@ -89,6 +164,8 @@ export function PageShell() {
       data-device-tier={deviceTier.tier}
       data-mobile={deviceTier.isMobile ? 'true' : 'false'}
       data-particle-multiplier={deviceTier.particleMultiplier.toFixed(2)}
+      data-polish-v2={polishV2Enabled ? 'true' : 'false'}
+      data-postfx={postFxEnabled ? 'true' : 'false'}
     >
       <div className="progress-rail" aria-hidden>
         <span
@@ -106,7 +183,15 @@ export function PageShell() {
           }}
         >
           <color attach="background" args={['#05070d']} />
-          <Suspense fallback={null}>{activeScene}</Suspense>
+          <Suspense fallback={null}>
+            {activeScene}
+            <ScenePostFx
+              enabled={postFxEnabled}
+              section={postFxSection}
+              progress={postFxProgress}
+              profile={visualProfile}
+            />
+          </Suspense>
         </Canvas>
       </div>
 
@@ -122,6 +207,13 @@ export function PageShell() {
           stops={tourStops}
           activeStopId={activeTourStopId}
           onSelectStop={setActiveTourStopId}
+        />
+        <FeaturedStoriesSection
+          reducedMotion={reducedMotion}
+          onProgress={setFeaturedStoriesProgress}
+          stories={featuredStories}
+          activeStoryId={activeFeaturedStoryId}
+          onHighlightStory={setActiveFeaturedStoryId}
         />
         <PlaceholderNextSection />
       </main>
