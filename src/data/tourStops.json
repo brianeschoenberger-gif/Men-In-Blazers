@@ -1,0 +1,102 @@
+[
+  {
+    "id": "seattle",
+    "city": "Seattle, WA",
+    "venue": "The Royal Room",
+    "dateLabel": "Mar 14",
+    "lat": 47.6062,
+    "lng": -122.3321,
+    "slug": "seattle",
+    "teaser": "Northwest watch party kickoff with local supporters and live pundit hits."
+  },
+  {
+    "id": "portland",
+    "city": "Portland, OR",
+    "venue": "Civic Taproom",
+    "dateLabel": "Mar 18",
+    "lat": 45.5152,
+    "lng": -122.6784,
+    "slug": "portland",
+    "teaser": "Pub culture feature shoot and fan stories from matchday rituals."
+  },
+  {
+    "id": "san-francisco",
+    "city": "San Francisco, CA",
+    "venue": "North Beach Social",
+    "dateLabel": "Mar 22",
+    "lat": 37.7749,
+    "lng": -122.4194,
+    "slug": "san-francisco",
+    "teaser": "Bay-side preview episode with city picks for derby weekend coverage."
+  },
+  {
+    "id": "los-angeles",
+    "city": "Los Angeles, CA",
+    "venue": "Sunset Football Club",
+    "dateLabel": "Mar 27",
+    "lat": 34.0522,
+    "lng": -118.2437,
+    "slug": "los-angeles",
+    "teaser": "Studio takeover night and creator-led panel on fan media culture."
+  },
+  {
+    "id": "denver",
+    "city": "Denver, CO",
+    "venue": "Union Pitch House",
+    "dateLabel": "Apr 02",
+    "lat": 39.7392,
+    "lng": -104.9903,
+    "slug": "denver",
+    "teaser": "Mountain west road stop with a live matchweek Q&A taping."
+  },
+  {
+    "id": "austin",
+    "city": "Austin, TX",
+    "venue": "South Congress FC Hall",
+    "dateLabel": "Apr 06",
+    "lat": 30.2672,
+    "lng": -97.7431,
+    "slug": "austin",
+    "teaser": "Supporters brunch guide and late-night watch party recommendations."
+  },
+  {
+    "id": "chicago",
+    "city": "Chicago, IL",
+    "venue": "Lakeshore Social Club",
+    "dateLabel": "Apr 10",
+    "lat": 41.8781,
+    "lng": -87.6298,
+    "slug": "chicago",
+    "teaser": "Midwest derby storytelling with local voices and venue picks."
+  },
+  {
+    "id": "atlanta",
+    "city": "Atlanta, GA",
+    "venue": "Peachtree Supporters Hall",
+    "dateLabel": "Apr 15",
+    "lat": 33.749,
+    "lng": -84.388,
+    "slug": "atlanta",
+    "teaser": "Live fan choir segment and matchday atmosphere recommendations."
+  },
+  {
+    "id": "new-york",
+    "city": "New York, NY",
+    "venue": "Brooklyn Football Exchange",
+    "dateLabel": "Apr 20",
+    "lat": 40.7128,
+    "lng": -74.006,
+    "slug": "new-york",
+    "teaser": "Five-borough local guide featuring watch spots and supporter routes."
+  },
+  {
+    "id": "boston",
+    "city": "Boston, MA",
+    "venue": "Harbor Matchhouse",
+    "dateLabel": "Apr 24",
+    "lat": 42.3601,
+    "lng": -71.0589,
+    "slug": "boston",
+    "teaser": "Final stop preview with archival football stories and fan meetups."
+  }
+]

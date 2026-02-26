@@ -1,6 +1,6 @@
 {
     "version":  1,
-    "generatedAtUtc":  "2026-02-25T21:11:53Z",
+    "generatedAtUtc":  "2026-02-26T04:04:17Z",
     "root":  "Assets",
     "notes":  [
                   "This file is the canonical asset catalog for the repository.",
@@ -8,6 +8,18 @@
                   "Copy or optimize into src/assets/ only when needed for runtime."
               ],
     "assets":  [
+                   {
+                       "id":  "0517b0da23f30a6e3ea3d6d1696b1a1919734346",
+                       "filename":  "0517b0da23f30a6e3ea3d6d1696b1a1919734346.webp",
+                       "sourcePath":  "Assets/0517b0da23f30a6e3ea3d6d1696b1a1919734346.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  17960,
+                       "sha256":  "69efe10d760fa5e5b117fb1346d740a9c343b1ef495491a08cfeada759f6bfea",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
                    {
                        "id":  "20230314_mib_0198_working_splash_2023",
                        "filename":  "20230314_MIB_0198-Working-Splash-2023.webp",
@@ -47,6 +59,18 @@
                                 ]
                    },
                    {
+                       "id":  "7ff00b706188f52610c3434feb483273d9383ebf",
+                       "filename":  "7ff00b706188f52610c3434feb483273d9383ebf.webp",
+                       "sourcePath":  "Assets/7ff00b706188f52610c3434feb483273d9383ebf.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  18206,
+                       "sha256":  "cf41deacb2d53d1c26570251bbfb76c0dd691fc685111ccd20490cf2efd55285",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
                        "id":  "bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy",
                        "filename":  "bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy.jpg",
                        "sourcePath":  "Assets/bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy.jpg",
@@ -83,6 +107,18 @@
                                 ]
                    },
                    {
+                       "id":  "meshy_ai_tunnel_to_the_field_0226040001_texture",
+                       "filename":  "Meshy_AI_Tunnel_to_the_Field_0226040001_texture.glb",
+                       "sourcePath":  "Assets/Meshy_AI_Tunnel_to_the_Field_0226040001_texture.glb",
+                       "type":  "file",
+                       "extension":  ".glb",
+                       "sizeBytes":  5518340,
+                       "sha256":  "27339dfcf2253a1ca20fc71e249cdcaf2c748f93ac8615dca2c33f920cfa2c88",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
                        "id":  "mib_medianetwork_v2_black",
                        "filename":  "mib-medianetwork-v2-black.png",
                        "sourcePath":  "Assets/mib-medianetwork-v2-black.png",
@@ -107,10 +143,13 @@
                                                "20260225_1243_01kjb7hvpff0wa3y2484cm199p"
                                            ],
                    "miscReference":  [
+                                         "0517b0da23f30a6e3ea3d6d1696b1a1919734346",
                                          "25_26report_email",
+                                         "7ff00b706188f52610c3434feb483273d9383ebf",
                                          "bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy",
                                          "chatgpt_image_feb_25_2026_01_07_16_pm",
-                                         "hq720"
+                                         "hq720",
+                                         "meshy_ai_tunnel_to_the_field_0226040001_texture"
                                      ]
                }
 }

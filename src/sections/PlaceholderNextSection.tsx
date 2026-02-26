@@ -4,14 +4,13 @@ export function PlaceholderNextSection() {
   return (
     <Section id="next" className="section--next">
       <div className="placeholder-card">
-        <p className="eyebrow">Next Milestone</p>
-        <h2>Tour Stops Map Placeholder</h2>
+        <p className="eyebrow">Milestone 4</p>
+        <h2>Featured Stories Placeholder</h2>
         <p>
-          This is the handoff target from Transition. Milestone 3 will introduce
-          pinned US map pins, route animation, and local guides.
+          Tour Stops now hands off here. Milestone 4 will introduce constellation
+          discovery cards for featured stories.
         </p>
       </div>
     </Section>
   )
 }
-
