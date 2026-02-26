@@ -16,6 +16,20 @@
 ```
 
 ## 2026-02-26
+- Milestones touched: deployment/tooling (GitHub Pages publishing reliability).
+- Skills used (or "none"): none.
+- Completed:
+  - Updated `vite.config.ts` to set `base` to `/Men-In-Blazers/` during GitHub Actions builds so asset URLs resolve correctly on project pages.
+  - Fixed Pages workflow in `.github/workflows/static.yml` to build the app (`npm ci`, `npm run build`) and upload `./dist` instead of uploading the raw repository.
+  - Kept local dev behavior unchanged (`base` remains `/` outside GitHub Actions).
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+- Remaining / next:
+  - Push these changes to `main` and confirm the latest Pages workflow run succeeds in the Actions tab.
+  - Hard-refresh the site after deploy completes.
+
+## 2026-02-26
 - Milestones touched: 1-2 (hero ambient idle-motion layer).
 - Skills used (or "none"): `threejs-animation`, `threejs-lighting` (`gsap-scrolltrigger` intentionally skipped because scroll mapping/pin timing was unchanged).
 - Completed:
