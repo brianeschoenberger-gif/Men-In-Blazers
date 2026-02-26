@@ -8,8 +8,10 @@ import {
   RepeatWrapping,
   type AmbientLight,
   type BufferGeometry,
+  type HemisphereLight,
   type MeshBasicMaterial,
   type Mesh,
+  type PerspectiveCamera,
   type MeshStandardMaterial,
   type PointLight,
 } from 'three'
@@ -40,6 +42,20 @@ function easeInOutCubic(value: number) {
   return 1 - Math.pow(-2 * value + 2, 3) / 2
 }
 
+function getTunnelRunCurve(progress: number) {
+  const clamped = MathUtils.clamp(progress, 0, 1)
+
+  if (clamped <= 0.3) {
+    return MathUtils.smoothstep(clamped, 0, 0.3) * 0.2
+  }
+
+  if (clamped <= 0.85) {
+    return MathUtils.lerp(0.2, 0.9, MathUtils.smoothstep(clamped, 0.3, 0.85))
+  }
+
+  return MathUtils.lerp(0.9, 1, MathUtils.smoothstep(clamped, 0.85, 1))
+}
+
 function ensureUv2(geometry: BufferGeometry) {
   const uv = geometry.getAttribute('uv')
   if (uv && !geometry.getAttribute('uv2')) {
@@ -55,18 +71,30 @@ export function HeroScene({
   visualProfile,
 }: HeroSceneProps) {
   const { camera, pointer, scene } = useThree()
+  const perspectiveCamera = camera as PerspectiveCamera
   const portalMaterialRef = useRef<MeshStandardMaterial>(null)
   const portalHaloMaterialRef = useRef<MeshStandardMaterial>(null)
   const portalRingRef = useRef<Mesh>(null)
+  const crowdPlateMeshRef = useRef<Mesh>(null)
+  const crowdParallaxMeshRef = useRef<Mesh>(null)
   const crowdPlateMaterialRef = useRef<MeshBasicMaterial>(null)
+  const crowdParallaxMaterialRef = useRef<MeshBasicMaterial>(null)
   const pitchFloorMaterialRef = useRef<MeshBasicMaterial>(null)
+  const stadiumApertureMaterialRef = useRef<MeshBasicMaterial>(null)
+  const stadiumHorizonMaterialRef = useRef<MeshBasicMaterial>(null)
+  const stadiumFrameMaterialRef = useRef<MeshBasicMaterial>(null)
   const ambientLightRef = useRef<AmbientLight>(null)
+  const hemisphereLightRef = useRef<HemisphereLight>(null)
   const tunnelEntryLightRef = useRef<PointLight>(null)
   const tunnelFillLightRef = useRef<PointLight>(null)
   const portalGlowLightRef = useRef<PointLight>(null)
+  const stadiumRimLightLeftRef = useRef<PointLight>(null)
+  const stadiumRimLightRightRef = useRef<PointLight>(null)
   const ceilingLightMaterials = useRef<MeshBasicMaterial[]>([])
   const sidePracticalMaterials = useRef<MeshBasicMaterial[]>([])
   const hazeTubeMaterials = useRef<MeshBasicMaterial[]>([])
+  const stadiumShaftMaterials = useRef<MeshBasicMaterial[]>([])
+  const baseFovRef = useRef<number | null>(null)
 
   const segmentLength = 6
   const segmentDepths = useMemo(
@@ -114,6 +142,7 @@ export function HeroScene({
   const hazePlateB = useOptionalTexture(getAssetPath('haze_plate_b'), { srgb: true })
   const grimeAtlas = useOptionalTexture(getAssetPath('grime_decal_atlas'), { srgb: true })
   const noiseTile = useOptionalTexture(getAssetPath('noise_tile'))
+  const radialBurstMask = useOptionalTexture(getAssetPath('radial_burst_mask'))
   const dustSoftTexture = useOptionalTexture(getAssetPath('dust_soft'))
   const dustSharpTexture = useOptionalTexture(getAssetPath('dust_sharp'))
   const glowTexture = useOptionalTexture(getAssetPath('glow_soft'))
@@ -184,7 +213,7 @@ export function HeroScene({
       )
   const hazeOpacityBase = reducedMotion
     ? 0.02
-    : visualProfile.hero.hazeOpacity * (0.4 + easedProgress * 0.62) * beatOpacityScale
+    : visualProfile.hero.hazeOpacity * (0.3 + easedProgress * 0.56) * beatOpacityScale
 
   const dustCount = reducedMotion
     ? 0
@@ -198,37 +227,84 @@ export function HeroScene({
 
   useEffect(() => {
     const previousFog = scene.fog
-    scene.fog = new Fog('#120d09', 4.5, 94)
+    scene.fog = new Fog('#2a1d13', 7.2, 108)
     return () => {
       scene.fog = previousFog
     }
   }, [scene])
 
+  useEffect(() => {
+    if (baseFovRef.current === null) {
+      baseFovRef.current = perspectiveCamera.fov
+    }
+
+    return () => {
+      if (baseFovRef.current !== null) {
+        perspectiveCamera.fov = baseFovRef.current
+        perspectiveCamera.updateProjectionMatrix()
+      }
+    }
+  }, [perspectiveCamera])
+
   useFrame((state, delta) => {
     const elapsed = state.clock.elapsedTime
     const normalized = reducedMotion ? 0.2 : MathUtils.clamp(progress, 0, 1)
     const eased = easeInOutCubic(normalized)
+    const runCurve = reducedMotion ? 0.12 : getTunnelRunCurve(normalized)
+    const runMotionStrength = reducedMotion
+      ? 0
+      : MathUtils.smoothstep(normalized, 0.28, 0.92)
     const allowDrift = allowPointerDrift && !reducedMotion
 
     const driftX = allowDrift ? pointer.x * 0.18 : 0
     const driftY = allowDrift ? pointer.y * 0.08 : 0
     const idleSwayX = reducedMotion ? 0 : Math.sin(elapsed * 0.22 + 1.2) * 0.05
     const idleBreathY = reducedMotion ? 0 : Math.sin(elapsed * 0.3) * 0.04
+    const strideFrequency = 3.05 + runMotionStrength * 2.9
+    const strideBobY = reducedMotion
+      ? 0
+      : Math.sin(elapsed * strideFrequency) * 0.034 * runMotionStrength
+    const strideSwayX = reducedMotion
+      ? 0
+      : Math.sin(elapsed * (strideFrequency * 0.5) + 0.9) * 0.023 * runMotionStrength
 
-    camera.position.x = MathUtils.damp(camera.position.x, driftX + idleSwayX, 3, delta)
+    camera.position.x = MathUtils.damp(
+      camera.position.x,
+      driftX + idleSwayX + strideSwayX,
+      3.2,
+      delta,
+    )
     camera.position.y = MathUtils.damp(
       camera.position.y,
-      1.05 + driftY + idleBreathY,
-      3.2,
+      1.05 + driftY + idleBreathY + strideBobY,
+      3.6,
       delta,
     )
     camera.position.z = MathUtils.damp(
       camera.position.z,
-      reducedMotion ? 10.9 : 11.5 - eased * visualProfile.hero.cameraTravel,
-      3,
+      reducedMotion ? 10.9 : 11.5 - runCurve * visualProfile.hero.cameraTravel,
+      3.8,
       delta,
     )
-    camera.lookAt(0, 0.08 + (reducedMotion ? 0 : Math.sin(elapsed * 0.18) * 0.03), -30)
+
+    const targetFovBase = baseFovRef.current ?? perspectiveCamera.fov
+    const fovOpen = MathUtils.smoothstep(normalized, 0.32, 0.84)
+    const fovSettle = MathUtils.smoothstep(normalized, 0.88, 1)
+    const targetFov = reducedMotion
+      ? targetFovBase
+      : targetFovBase + fovOpen * 2.55 - fovSettle * 1.28
+    const nextFov = MathUtils.damp(perspectiveCamera.fov, targetFov, 3.4, delta)
+    if (Math.abs(nextFov - perspectiveCamera.fov) > 0.005) {
+      perspectiveCamera.fov = nextFov
+      perspectiveCamera.updateProjectionMatrix()
+    }
+
+    const lookAheadZ = MathUtils.lerp(-30, -52, runCurve)
+    const lookAheadY =
+      0.08 +
+      (reducedMotion ? 0 : Math.sin(elapsed * 0.18) * 0.03) -
+      runMotionStrength * 0.02
+    camera.lookAt(0, lookAheadY, lookAheadZ)
 
     const flicker = reducedMotion
       ? 0
@@ -236,22 +312,26 @@ export function HeroScene({
     const idlePulse = reducedMotion
       ? 0
       : Math.sin(elapsed * 1.4) * 0.1 + Math.sin(elapsed * 2.1 + 0.7) * 0.05
-    const practicalProgress = MathUtils.smoothstep(eased, 0.24, 0.92)
+    const practicalProgress = MathUtils.smoothstep(runCurve, 0.2, 0.95)
 
     if (ambientLightRef.current) {
-      ambientLightRef.current.intensity = MathUtils.lerp(0.05, 0.18, eased)
+      ambientLightRef.current.intensity = MathUtils.lerp(0.14, 0.31, eased)
+    }
+
+    if (hemisphereLightRef.current) {
+      hemisphereLightRef.current.intensity = MathUtils.lerp(0.18, 0.32, eased)
     }
 
     if (tunnelEntryLightRef.current) {
       tunnelEntryLightRef.current.intensity = MathUtils.clamp(
-        MathUtils.lerp(0.24, 0.86, eased) + flicker,
-        0.18,
-        1.08,
+        MathUtils.lerp(0.42, 1.18, eased) + flicker,
+        0.34,
+        1.36,
       )
     }
 
     if (tunnelFillLightRef.current) {
-      tunnelFillLightRef.current.intensity = MathUtils.lerp(0.12, 0.4, eased)
+      tunnelFillLightRef.current.intensity = MathUtils.lerp(0.24, 0.62, eased)
     }
 
     if (portalGlowLightRef.current) {
@@ -268,6 +348,8 @@ export function HeroScene({
     }
 
     const portalReveal = MathUtils.smoothstep(eased, 0.48, 0.96)
+    const stadiumPayoff = MathUtils.smoothstep(eased, 0.62, 1)
+    const crowdDepthReveal = MathUtils.smoothstep(eased, 0.66, 1)
 
     if (portalMaterialRef.current) {
       portalMaterialRef.current.emissiveIntensity = MathUtils.clamp(
@@ -290,19 +372,81 @@ export function HeroScene({
       )
     }
 
+    if (stadiumApertureMaterialRef.current) {
+      stadiumApertureMaterialRef.current.opacity = reducedMotion
+        ? 0.1
+        : MathUtils.lerp(0.04, 0.28, stadiumPayoff) * beatOpacityScale
+    }
+
+    if (stadiumHorizonMaterialRef.current) {
+      stadiumHorizonMaterialRef.current.opacity = reducedMotion
+        ? 0.08
+        : MathUtils.lerp(0.05, 0.34, stadiumPayoff)
+    }
+
+    if (stadiumFrameMaterialRef.current) {
+      stadiumFrameMaterialRef.current.opacity = reducedMotion
+        ? 0.16
+        : MathUtils.lerp(0.08, 0.42, stadiumPayoff) * beatOpacityScale
+    }
+
     if (portalRingRef.current && !reducedMotion) {
       portalRingRef.current.rotation.z += delta * 0.08
       portalRingRef.current.rotation.x = Math.sin(elapsed * 0.24) * 0.04
     }
+
+    if (crowdPlateMeshRef.current && !reducedMotion) {
+      crowdPlateMeshRef.current.position.y = -0.2 + runCurve * 0.08
+      crowdPlateMeshRef.current.position.z = -83.62 - runCurve * 0.12
+    }
+
+    if (crowdParallaxMeshRef.current && !reducedMotion) {
+      crowdParallaxMeshRef.current.position.y = 0.22 + runCurve * 0.12
+      crowdParallaxMeshRef.current.position.z = -84.95 - runCurve * 0.28
+    }
+
     if (crowdPlateMaterialRef.current) {
       crowdPlateMaterialRef.current.opacity = reducedMotion
-        ? 0.38
-        : MathUtils.lerp(0.14, 0.58, portalReveal) * beatOpacityScale
+        ? 0.42
+        : MathUtils.lerp(0.2, 0.66, portalReveal) * beatOpacityScale
+    }
+    if (crowdParallaxMaterialRef.current) {
+      crowdParallaxMaterialRef.current.opacity = reducedMotion
+        ? 0.18
+        : MathUtils.lerp(0.04, 0.34, crowdDepthReveal) * beatOpacityScale
     }
     if (pitchFloorMaterialRef.current) {
       pitchFloorMaterialRef.current.opacity = reducedMotion
-        ? 0.24
-        : MathUtils.lerp(0.08, 0.42, portalReveal)
+        ? 0.28
+        : MathUtils.lerp(0.14, 0.48, portalReveal)
+    }
+
+    if (stadiumRimLightLeftRef.current) {
+      stadiumRimLightLeftRef.current.intensity = reducedMotion
+        ? 0.18
+        : MathUtils.lerp(0.06, 0.82, stadiumPayoff) + idlePulse * 0.08
+    }
+
+    if (stadiumRimLightRightRef.current) {
+      stadiumRimLightRightRef.current.intensity = reducedMotion
+        ? 0.18
+        : MathUtils.lerp(0.06, 0.82, stadiumPayoff) + idlePulse * 0.08
+    }
+
+    for (let index = 0; index < stadiumShaftMaterials.current.length; index += 1) {
+      const material = stadiumShaftMaterials.current[index]
+      if (!material) {
+        continue
+      }
+
+      const shaftPulse = reducedMotion
+        ? 0
+        : Math.sin(elapsed * (1.6 + index * 0.25) + index * 0.8) * 0.05
+      material.opacity = MathUtils.clamp(
+        (MathUtils.lerp(0.03, 0.24, stadiumPayoff) + shaftPulse) * beatOpacityScale,
+        0.02,
+        0.28,
+      )
     }
 
     for (let index = 0; index < ceilingLightMaterials.current.length; index += 1) {
@@ -317,9 +461,9 @@ export function HeroScene({
         ? 0
         : Math.sin(elapsed * 7.2 + index * 0.9) * 0.06
       material.opacity = MathUtils.clamp(
-        MathUtils.lerp(0.06, 0.34, eased) + depthBoost + shimmer + flicker * 0.8,
-        0.05,
-        0.58,
+        MathUtils.lerp(0.14, 0.48, eased) + depthBoost + shimmer + flicker * 0.8,
+        0.1,
+        0.68,
       )
     }
 
@@ -334,10 +478,10 @@ export function HeroScene({
         ? 0
         : Math.sin(elapsed * 6.4 + index * 0.92) * 0.018
       material.opacity = MathUtils.clamp(
-        (MathUtils.lerp(0.02, 0.16, practicalProgress) + edgeLift + stripFlicker) *
+        (MathUtils.lerp(0.06, 0.24, practicalProgress) + edgeLift + stripFlicker) *
           beatOpacityScale,
-        0.02,
-        0.28,
+        0.05,
+        0.36,
       )
     }
 
@@ -372,17 +516,21 @@ export function HeroScene({
 
   return (
     <group>
-      <ambientLight ref={ambientLightRef} intensity={0.18} />
+      <ambientLight ref={ambientLightRef} intensity={0.22} />
+      <hemisphereLight
+        ref={hemisphereLightRef}
+        args={['#f2bf8d', '#26160f', 0.22]}
+      />
       <pointLight
         ref={tunnelEntryLightRef}
         position={[0, 2.6, 8.4]}
-        intensity={0.5}
+        intensity={0.78}
         color={STYLE_TOKENS.hero.practicalColor}
       />
       <pointLight
         ref={tunnelFillLightRef}
         position={[0, 0.95, -24]}
-        intensity={0.22}
+        intensity={0.36}
         color={STYLE_TOKENS.hero.fillColor}
       />
       <pointLight
@@ -391,8 +539,20 @@ export function HeroScene({
         intensity={1.3}
         color={STYLE_TOKENS.hero.portalColor}
       />
-      <pointLight position={[-4.7, 0.9, -56]} intensity={0.52} color="#ffc67f" />
-      <pointLight position={[4.7, 0.9, -56]} intensity={0.52} color="#ffc67f" />
+      <pointLight
+        ref={stadiumRimLightLeftRef}
+        position={[-3.1, 1.75, -83.6]}
+        intensity={0.16}
+        color="#ffd8b0"
+      />
+      <pointLight
+        ref={stadiumRimLightRightRef}
+        position={[3.1, 1.75, -83.6]}
+        intensity={0.16}
+        color="#ffd8b0"
+      />
+      <pointLight position={[-4.7, 0.9, -56]} intensity={0.72} color="#ffd19a" />
+      <pointLight position={[4.7, 0.9, -56]} intensity={0.72} color="#ffd19a" />
 
       {segmentDepths.map((depth, index) => (
         <group key={depth} position={[0, 0, depth]}>
@@ -425,7 +585,7 @@ export function HeroScene({
           <mesh position={[-5.9, 0, 0]}>
             <boxGeometry args={[0.34, 6.1, segmentLength]} onUpdate={ensureUv2} />
             <meshStandardMaterial
-              color="#20150f"
+              color="#2d1f15"
               roughness={0.9}
               metalness={0.1}
               map={wallAlbedo ?? undefined}
@@ -438,7 +598,7 @@ export function HeroScene({
           <mesh position={[5.9, 0, 0]}>
             <boxGeometry args={[0.34, 6.1, segmentLength]} onUpdate={ensureUv2} />
             <meshStandardMaterial
-              color="#20150f"
+              color="#2d1f15"
               roughness={0.9}
               metalness={0.1}
               map={wallAlbedo ?? undefined}
@@ -553,6 +713,20 @@ export function HeroScene({
         />
       </mesh>
 
+      <mesh position={[0, 0.14, -83.72]}>
+        <planeGeometry args={[8.6, 4.1]} />
+        <meshBasicMaterial
+          ref={stadiumApertureMaterialRef}
+          color="#ffd4a2"
+          map={portalGradient ?? radialBurstMask ?? undefined}
+          alphaMap={radialBurstMask ?? portalGradient ?? undefined}
+          transparent
+          opacity={0.12}
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+
       <mesh ref={portalRingRef} position={[0, 0.04, -83.82]}>
         <torusGeometry args={[4.95, 0.22, 18, 64]} />
         <meshStandardMaterial
@@ -567,7 +741,73 @@ export function HeroScene({
         />
       </mesh>
 
-      <mesh position={[0, -0.2, -83.62]}>
+      {deviceTier !== 'low' ? (
+        <>
+          <mesh position={[-2.35, 0.72, -82.98]} rotation={[0.06, 0.28, 0]}>
+            <planeGeometry args={[3.1, 5.5]} />
+            <meshBasicMaterial
+              ref={(material) => {
+                if (material) {
+                  stadiumShaftMaterials.current[0] = material
+                }
+              }}
+              color="#ffd6a5"
+              map={portalGradient ?? glowTexture ?? undefined}
+              alphaMap={portalGradient ?? glowTexture ?? undefined}
+              transparent
+              opacity={0.08}
+              blending={AdditiveBlending}
+              depthWrite={false}
+            />
+          </mesh>
+          <mesh position={[2.35, 0.72, -82.98]} rotation={[0.06, -0.28, 0]}>
+            <planeGeometry args={[3.1, 5.5]} />
+            <meshBasicMaterial
+              ref={(material) => {
+                if (material) {
+                  stadiumShaftMaterials.current[1] = material
+                }
+              }}
+              color="#ffd6a5"
+              map={portalGradient ?? glowTexture ?? undefined}
+              alphaMap={portalGradient ?? glowTexture ?? undefined}
+              transparent
+              opacity={0.08}
+              blending={AdditiveBlending}
+              depthWrite={false}
+            />
+          </mesh>
+        </>
+      ) : null}
+
+      <mesh position={[0, 0.36, -84.64]}>
+        <planeGeometry args={[11.2, 1.5]} />
+        <meshBasicMaterial
+          ref={stadiumHorizonMaterialRef}
+          color="#ffd8aa"
+          map={portalGradient ?? undefined}
+          alphaMap={portalGradient ?? undefined}
+          transparent
+          opacity={0.08}
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+
+      <mesh position={[0, 0.05, -83.68]}>
+        <ringGeometry args={[4.35, 5.42, 48]} />
+        <meshBasicMaterial
+          ref={stadiumFrameMaterialRef}
+          color="#f1be8a"
+          map={radialBurstMask ?? portalGradient ?? undefined}
+          alphaMap={radialBurstMask ?? portalGradient ?? undefined}
+          transparent
+          opacity={0.18}
+          depthWrite={false}
+        />
+      </mesh>
+
+      <mesh ref={crowdPlateMeshRef} position={[0, -0.2, -83.62]}>
         <planeGeometry args={[10.2, 2.4]} />
         <meshBasicMaterial
           ref={crowdPlateMaterialRef}
@@ -575,6 +815,19 @@ export function HeroScene({
           color="#f8d5ad"
           transparent
           opacity={0.36}
+        />
+      </mesh>
+
+      <mesh ref={crowdParallaxMeshRef} position={[0, 0.22, -84.95]}>
+        <planeGeometry args={[12, 3.1]} />
+        <meshBasicMaterial
+          ref={crowdParallaxMaterialRef}
+          map={stadiumCrowdPlate ?? undefined}
+          color="#f8d5ad"
+          transparent
+          opacity={0.12}
+          blending={AdditiveBlending}
+          depthWrite={false}
         />
       </mesh>
 

@@ -1,10 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
 
 async function readTransitionEnergyLevel(page: Page) {
-  return page.locator('.transition-overlay').evaluate((element) => {
-    const value = (element as HTMLElement).style
-      .getPropertyValue('--energy-level')
-      .trim()
+  return page.locator('.transition-state').evaluate((element) => {
+    const value = (element as HTMLElement).dataset.transitionEnergy ?? '0'
     const parsed = Number.parseFloat(value)
     return Number.isFinite(parsed) ? parsed : 0
   })
@@ -18,9 +16,6 @@ test('hero and transition content is present', async ({ page }) => {
     page.getByRole('heading', { level: 1, name: 'Tunnel to Pitch' }),
   ).toBeVisible()
   await expect(
-    page.getByRole('heading', { level: 2, name: 'Crowd Energy Surge' }),
-  ).toBeVisible()
-  await expect(
     page.getByRole('heading', { level: 2, name: 'Tour Stops' }),
   ).toHaveCount(1)
   await expect(
@@ -28,7 +23,7 @@ test('hero and transition content is present', async ({ page }) => {
   ).toHaveCount(1)
   await expect(page.getByRole('button', { name: 'Watch' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Listen' })).toBeVisible()
-  await expect(page.locator('.transition-meter__bar')).toHaveCount(5)
+  await expect(page.locator('.transition-state')).toHaveCount(1)
   await expect(page.locator('.tour-map-pin')).toHaveCount(10)
   await expect(page.locator('.tour-chip')).toHaveCount(10)
   await expect(page.locator('.featured-card')).toHaveCount(8)
@@ -161,7 +156,7 @@ test('transition surges, settles, and hands off to next section', async ({
   expect(peakEnergy).toBeGreaterThan(startEnergy + 0.2)
   expect(endEnergy).toBeGreaterThan(0.25)
   expect(peakEnergy).toBeGreaterThan(endEnergy + 0.1)
-  await expect(page.locator('.transition-overlay')).toHaveAttribute(
+  await expect(page.locator('.transition-state')).toHaveAttribute(
     'data-transition-beat',
     'T4',
   )
@@ -197,7 +192,7 @@ test('hero and transition beat attributes progress with scroll', async ({ page }
     await page.evaluate((y) => window.scrollTo(0, y), maxScroll * fraction)
     await page.waitForTimeout(160)
     const beat = await page
-      .locator('.transition-overlay')
+      .locator('.transition-state')
       .getAttribute('data-transition-beat')
     if (beat) {
       transitionBeats.add(beat)
@@ -221,9 +216,6 @@ test('reduced-motion path disables pinned scrub spacers and keeps transition cal
   expect(prefersReducedMotion).toBeTruthy()
   await expect(
     page.getByRole('heading', { level: 1, name: 'Tunnel to Pitch' }),
-  ).toBeVisible()
-  await expect(
-    page.getByRole('heading', { level: 2, name: 'Crowd Energy Surge' }),
   ).toBeVisible()
   await expect(page.locator('.pin-spacer')).toHaveCount(0)
   await expect(page.locator('.page-shell')).toHaveAttribute('data-postfx', 'false')
@@ -287,9 +279,6 @@ test('mobile fallback enables low tier and preserves core section content', asyn
 
   await expect(
     page.getByRole('heading', { level: 1, name: 'Tunnel to Pitch' }),
-  ).toBeVisible()
-  await expect(
-    page.getByRole('heading', { level: 2, name: 'Crowd Energy Surge' }),
   ).toBeVisible()
 
   await context.close()

@@ -16,6 +16,91 @@
 ```
 
 ## 2026-02-26
+- Milestones touched: 2 (Transition "Crowd Energy Surge" DOM overlay simplification pass).
+- Skills used (or "none"): none (skipped specialized 3D skills because this was a focused DOM/layout cleanup and smoke assertion update).
+- Completed:
+  - Removed the visible transition overlay card (the second text box) from `TransitionSection`.
+  - Kept transition beat/energy state in DOM via hidden `transition-state` node for choreography/test observability.
+  - Added `.transition-state` visually-hidden utility styling.
+  - Updated smoke tests to use `.transition-state` data attributes instead of visible transition card heading/meter assertions.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+  - Captured screenshots:
+    - `test-results/checks/hero-desktop-no-transition-card.png`
+    - `test-results/checks/transition-desktop-no-transition-card.png`
+    - `test-results/checks/hero-mobile-no-transition-card.png`
+- Remaining / next:
+  - Confirm this temporary no-card transition treatment is approved.
+  - Optional follow-up: add a minimal non-boxed transition label if you still want lightweight orientation text.
+
+## 2026-02-26
+- Milestones touched: 1 (Hero "Tunnel to Pitch" Slice 4 stadium pull layering/payoff), 2 (hero-to-transition visual continuity).
+- Skills used (or "none"): `threejs-lighting`, `threejs-animation` (skipped `threejs-shaders` and `imagegen` to keep this pass low-cost, deterministic, and within current asset set).
+- Completed:
+  - Applied a quick amplitude tweak pass to the hero run-feel:
+    - increased stride bob/sway and stride frequency,
+    - increased FOV ramp/settle by ~15% for stronger momentum.
+  - Implemented Slice 4 stadium payoff layering in `HeroScene`:
+    - added stadium aperture veil and horizon glow planes,
+    - added directional exit shafts (tier-gated away from low tier),
+    - added secondary crowd parallax layer with depth motion,
+    - added stadium rim lights that ramp during H4/H5,
+    - added portal-frame ring treatment to improve threshold read.
+  - Wired beat-driven opacity/intensity choreography so early beats stay restrained and late beats carry the payoff.
+  - Preserved reduced-motion behavior and low-tier fallbacks.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+  - Captured screenshots:
+    - `test-results/checks/hero-desktop-slice4.png`
+    - `test-results/checks/hero-pull-desktop-slice4.png`
+    - `test-results/checks/transition-desktop-slice4.png`
+    - `test-results/checks/hero-mobile-slice4.png`
+- Remaining / next:
+  - Review the screenshot set and choose whether to push the payoff brighter at H5 (currently still conservative).
+  - If desired, tune late-beat stadium layer opacities upward another 10-20% for a stronger "into stadium" moment.
+
+## 2026-02-26
+- Milestones touched: 1 (Hero "Tunnel to Pitch" camera-motion polish pass).
+- Skills used (or "none"): `threejs-animation`, `threejs-fundamentals` (skipped `gsap-scrolltrigger` because pin/scrub timing and trigger ranges were intentionally unchanged).
+- Completed:
+  - Added a beat-aware hero run-curve (`getTunnelRunCurve`) so camera travel ramps more aggressively through H3-H5 while keeping a controlled early pace.
+  - Added subtle procedural "stride" motion to camera translation (x/y sway+bob) to increase the sensation of moving down the tunnel.
+  - Added a restrained camera FOV ramp-and-settle to amplify forward momentum without destabilizing readability.
+  - Updated camera look-ahead targeting so framing tracks deeper into the tunnel as progress advances.
+  - Preserved reduced-motion behavior by disabling run stride/FOV dynamics under reduced-motion mode and restoring baseline camera FOV on scene cleanup.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Visual side-by-side review of opening run-feel against the reference; tune stride amplitude/frequency by ~10-20% if needed.
+  - If approved, continue with Slice 4 (stadium pull layering) for a stronger tunnel-to-stadium payoff.
+
+## 2026-02-26
+- Milestones touched: 1 (Hero "Tunnel to Pitch" lighting/readability pass), 2 (hero-to-transition exposure continuity).
+- Skills used (or "none"): `threejs-lighting`, `threejs-fundamentals` (skipped `threejs-shaders` for this pass to keep the fix low-risk and performance-stable).
+- Completed:
+  - Reduced global scene darkening during the opening by adding active-phase-aware overlay treatment in `PageShell`/`globals.css` (lighter in hero, moderated in transition).
+  - Rebalanced high-tier post-FX envelope to reduce vignette crush and lift mids (`visualProfiles.ts`).
+  - Tuned Hero scene readability in `HeroScene.tsx`:
+    - lighter fog color/range for better depth legibility,
+    - stronger practical/fill lighting and added hemisphere fill for wall/floor separation,
+    - brighter tunnel practical strips and ceiling practical visibility,
+    - slightly stronger portal-adjacent crowd/pitch reveal to clarify stadium destination.
+  - Warmed tunnel base/shadow style tokens to preserve mood without obscuring tunnel form.
+- Validation run:
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+  - `cmd /c npm run lint` (rerun sequentially after an initial transient parallel race on `test-results` lookup)
+- Remaining / next:
+  - Visual review pass against the reference for H1-H3 tunnel identity and H4-H5 portal pull.
+  - If approved, continue with Slice 3 (camera/stride/FOV motion polish) for stronger "running down the tunnel" sensation.
+
+## 2026-02-26
 - Milestones touched: 1 (hero text placement/scale refinement).
 - Skills used (or "none"): none (skipped specialized skills because this was a targeted CSS layout/typography update).
 - Completed:

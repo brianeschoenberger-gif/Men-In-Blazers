@@ -166,6 +166,7 @@ export function PageShell() {
       data-particle-multiplier={deviceTier.particleMultiplier.toFixed(2)}
       data-polish-v2={polishV2Enabled ? 'true' : 'false'}
       data-postfx={postFxEnabled ? 'true' : 'false'}
+      data-active-phase={activePhase}
     >
       <div className="progress-rail" aria-hidden>
         <span
