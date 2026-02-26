@@ -127,7 +127,7 @@ body {
 }
 
 .section--hero {
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .section--transition,
@@ -187,23 +187,20 @@ body {
 
 .hero-overlay {
   --hero-overlay-opacity: 0.56;
-  width: min(620px, 96%);
-  border-color: rgba(255, 192, 128, 0.24);
-  backdrop-filter: blur(6px);
-  background:
-    linear-gradient(
-      145deg,
-      rgba(26, 15, 8, var(--hero-overlay-opacity)),
-      rgba(10, 7, 5, calc(var(--hero-overlay-opacity) * 0.52))
-    ),
-    radial-gradient(
-      circle at 70% 10%,
-      rgba(255, 195, 124, calc(var(--hero-overlay-opacity) * 0.16)) 0%,
-      transparent 55%
-    );
-  box-shadow:
-    0 24px 56px rgba(3, 2, 1, 0.56),
-    inset 0 0 0 1px rgba(255, 214, 168, 0.04);
+  width: min(1220px, 94vw);
+  margin-inline: auto;
+  border: none;
+  border-radius: 0;
+  padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 4vw, 3rem);
+  backdrop-filter: none;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+
+.hero-overlay::before,
+.hero-overlay::after {
+  display: none;
 }
 
 .transition-overlay {
@@ -329,15 +326,15 @@ body {
 .hero-title {
   margin: 0.4rem 0 0.55rem;
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 11vw, 6.8rem);
+  font-size: clamp(3rem, 11vw, 10.2rem);
   line-height: 0.88;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: transparent;
   background: linear-gradient(182deg, #fff8eb 0%, #ffdcae 52%, #ce905a 100%);
   -webkit-background-clip: text;
   background-clip: text;
-  text-shadow: 0 8px 34px rgba(255, 183, 102, 0.2);
+  text-shadow: 0 8px 34px rgba(9, 8, 6, 0.35);
 }
 
 .hero-subtitle,
@@ -355,6 +352,7 @@ body {
 .hero-meta {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.58rem;
   margin-top: 1rem;
   font-size: 0.67rem;
@@ -388,8 +386,13 @@ body {
 .cta-row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.85rem;
   margin-top: 1.35rem;
+}
+
+.hero-overlay .hero-subtitle {
+  margin-inline: auto;
 }
 
 .cta-button {

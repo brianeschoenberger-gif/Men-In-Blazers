@@ -7,6 +7,7 @@ type DustParticlesProps = {
   reducedMotion: boolean
   opacity: number
   size: number
+  driftSpeed?: number
   mapTexture?: Texture | null
   color?: string
 }
@@ -16,6 +17,7 @@ export function DustParticles({
   reducedMotion,
   opacity,
   size,
+  driftSpeed = 1.2,
   mapTexture,
   color = '#d9e2ff',
 }: DustParticlesProps) {
@@ -32,12 +34,15 @@ export function DustParticles({
     return data
   }, [count])
 
-  useFrame((_state, delta) => {
+  useFrame((state, delta) => {
     if (!pointsRef.current || reducedMotion) {
       return
     }
+    const elapsed = state.clock.elapsedTime
     pointsRef.current.rotation.y += delta * 0.02
     pointsRef.current.rotation.x += delta * 0.005
+    pointsRef.current.position.z = -80 + (elapsed * driftSpeed * 8) % 80
+    pointsRef.current.position.y = Math.sin(elapsed * 0.28) * 0.08
   })
 
   return (

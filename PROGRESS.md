@@ -16,6 +16,56 @@
 ```
 
 ## 2026-02-26
+- Milestones touched: 1-2 (hero ambient idle-motion layer).
+- Skills used (or "none"): `threejs-animation`, `threejs-lighting` (`gsap-scrolltrigger` intentionally skipped because scroll mapping/pin timing was unchanged).
+- Completed:
+  - Added always-on hero idle motion independent of scroll progress in `HeroScene`:
+    - subtle camera breathing/sway
+    - portal glow/emissive idle pulse
+    - slow portal ring movement
+    - haze texture drift for atmospheric flow
+  - Added low-cost continuous dust travel in `DustParticles` (group-level drift + bob), with separate drift speeds for the two hero dust layers.
+  - Preserved reduced-motion safeguards by disabling these idle effects when reduced motion is active.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Optional: tune idle amplitude (camera sway and portal pulse) after your next visual review.
+
+## 2026-02-26
+- Milestones touched: 1 (Hero DOM overlay presentation pass).
+- Skills used (or "none"): none (skipped specialized skills because this was a focused CSS layout/style adjustment only).
+- Completed:
+  - Removed the framed hero card treatment (border, radius, backdrop blur, card background, and decorative edge lines) so headline content sits directly on the scene.
+  - Centered hero composition and text treatment to match a cleaner full-bleed headline direction.
+  - Center-aligned hero metadata and CTA row, and widened title container for stronger single-hero statement styling.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Optional: if you want it even closer to the reference, we can tighten headline letter spacing and reduce CTA visual weight further.
+
+## 2026-02-26
+- Milestones touched: 1-2 (hero tunnel readability pass).
+- Skills used (or "none"): `threejs-geometry`, `threejs-materials`, `threejs-lighting`, `threejs-animation` (`gsap-scrolltrigger` intentionally skipped because pin/scrub timing was not changed).
+- Completed:
+  - Rebuilt the Hero visual composition to read as a continuous corridor instead of layered camera-facing panes.
+  - Removed pane-like hero layers (beam cards, front haze cards, and extra portal card stack) and replaced them with tunnel-native cues:
+    - repeating structural ribs and side practical strips per segment
+    - cylindrical/tube haze volumes running down the tunnel axis
+    - floor depth treatment and a simplified end-state portal/crowd composition
+  - Kept existing Milestone 1 requirements intact: DOM-first hero content, reduced-motion compatibility, and mobile/low-tier stability.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - If this direction is approved, refresh hero visual baselines with `cmd /c npm run test:visual:update`.
+  - Optional follow-up: tune tunnel rib contrast and spacing against your preferred Sora reference frame.
+
+## 2026-02-26
 - Milestones touched: 1-2 (hero "Tunnel to Pitch" art pass refinement).
 - Skills used (or "none"): `threejs-textures`, `threejs-materials`, `threejs-lighting`, `threejs-animation` (`gsap-scrolltrigger` intentionally skipped because scroll choreography was not changed).
 - Completed:
