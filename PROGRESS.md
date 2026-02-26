@@ -16,6 +16,20 @@
 ```
 
 ## 2026-02-26
+- Milestones touched: 1 (hero text placement/scale refinement).
+- Skills used (or "none"): none (skipped specialized skills because this was a targeted CSS layout/typography update).
+- Completed:
+  - Moved hero copy block lower in the viewport so the text sits under the main tunnel visual center.
+  - Reduced hero headline scale on desktop and mobile for cleaner balance against the scene.
+  - Preserved centered layout and DOM-first CTA/readability behavior.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+- Remaining / next:
+  - Optional visual follow-up: tune vertical offset and headline size by another ~5-10% after your side-by-side review.
+
+## 2026-02-26
 - Milestones touched: deployment/tooling (GitHub Pages publishing reliability).
 - Skills used (or "none"): none.
 - Completed:
