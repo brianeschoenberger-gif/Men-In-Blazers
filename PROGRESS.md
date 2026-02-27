@@ -16,6 +16,39 @@
 ```
 
 ## 2026-02-27
+- Milestones touched: 1 (Hero tunnel floor art direction cleanup).
+- Skills used (or "none"): `threejs-geometry` (skipped additional skills because this was a focused geometry removal pass).
+- Completed:
+  - Removed the tunnel center lane-line treatment from `HeroScene` so the floor reads as a tunnel-to-pitch surface instead of a roadway:
+    - deleted center seam strip geometry,
+    - deleted glowing center guide plane,
+    - deleted seam cap markers.
+  - Removed the now-unused `floorGuideMaterials` material ref and its per-frame opacity update loop.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run test:smoke` (8/8 passed)
+- Remaining / next:
+  - If you want extra floor realism after removing center markings, next step is subtle side-edge wear decals or roughness variation near the walls only.
+
+## 2026-02-27
+- Milestones touched: 1 (Hero tunnel exit color cleanup).
+- Skills used (or "none"): `threejs-materials`, `threejs-textures` (skipped broader 3D skills because this was a targeted hero portal material/texture routing fix).
+- Completed:
+  - Removed blue/cyan portal texture bleed in hero exit by updating `HeroScene` portal stack:
+    - stopped using blue `portal_gradient.webp` as visible color map for portal/aperture/horizon/shaft layers (kept it fallback-only for masking paths),
+    - converted main exit portal plane to `meshBasicMaterial` and drove reveal with opacity instead of emissive/specular lighting response,
+    - flattened portal highlight behavior and pushed crowd/photo reveal floors to true zero before late detail reveal.
+  - Removed unused portal texture bindings created by the cleanup.
+  - Captured verification frame: `test-results/checks/hero-h3-blue-fix-check.png` (cyan exit artifacts removed).
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke` (8/8 passed)
+  - `cmd /c npx playwright test tests/visual/tmp-blue-fix.spec.ts` (temp check spec removed after capture)
+- Remaining / next:
+  - If you want the exit brighter while keeping neutral color, next tune is increasing `portalMaterialRef` opacity ceiling slightly (`0.98 -> 1`) or shifting portal reveal timing, without reintroducing map-driven color.
+
+## 2026-02-27
 - Milestones touched: 1 (Hero opening narrative, tunnel depth/readability, camera inertia, late portal reveal), 2 (hero threshold flash onset/handoff timing tune).
 - Skills used (or "none"): `threejs-fundamentals`, `threejs-geometry`, `threejs-lighting`, `threejs-materials`, `threejs-textures`, `threejs-loaders`, `gsap-scrolltrigger` (skipped `threejs-postprocessing` on purpose to prioritize core scene readability/choreography before adding more FX complexity).
 - Completed:

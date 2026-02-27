@@ -83,7 +83,7 @@ export function HeroScene({
 }: HeroSceneProps) {
   const { camera, pointer, scene, gl } = useThree()
   const perspectiveCamera = camera as PerspectiveCamera
-  const portalMaterialRef = useRef<MeshStandardMaterial>(null)
+  const portalMaterialRef = useRef<MeshBasicMaterial>(null)
   const portalHaloMaterialRef = useRef<MeshStandardMaterial>(null)
   const portalRingRef = useRef<Mesh>(null)
   const crowdPlateMeshRef = useRef<Mesh>(null)
@@ -107,7 +107,6 @@ export function HeroScene({
   const stadiumRimLightRightRef = useRef<PointLight>(null)
   const ceilingLightMaterials = useRef<MeshBasicMaterial[]>([])
   const sidePracticalMaterials = useRef<MeshBasicMaterial[]>([])
-  const floorGuideMaterials = useRef<MeshBasicMaterial[]>([])
   const cableMaterials = useRef<MeshStandardMaterial[]>([])
   const hazeTubeMaterials = useRef<MeshBasicMaterial[]>([])
   const stadiumShaftMaterials = useRef<MeshBasicMaterial[]>([])
@@ -150,14 +149,6 @@ export function HeroScene({
   })
   const stadiumCrowdPlate = useOptionalTexture(
     getTextureVariantPath('stadium_crowd_plate', visualProfile.textureSet),
-    { srgb: true },
-  )
-  const stadiumTunnelPortal = useOptionalTexture(
-    getTextureVariantPath('stadium_tunnel_portal', visualProfile.textureSet),
-    { srgb: true },
-  )
-  const stadiumPortalPlateClean = useOptionalTexture(
-    getTextureVariantPath('stadium_portal_plate_clean', visualProfile.textureSet),
     { srgb: true },
   )
   const ceilingStrip = useOptionalTexture(getAssetPath('ceiling_emissive_strip'), {
@@ -447,10 +438,10 @@ export function HeroScene({
     }
 
     if (portalMaterialRef.current) {
-      portalMaterialRef.current.emissiveIntensity = MathUtils.clamp(
-        MathUtils.lerp(0.32, 3.8, portalRimReveal) + thresholdFlash * 7.2,
-        0.24,
-        10.8,
+      portalMaterialRef.current.opacity = MathUtils.clamp(
+        MathUtils.lerp(0.36, 0.98, portalRimReveal) + thresholdFlash * 0.26,
+        0.3,
+        1,
       )
     }
     if (portalHaloMaterialRef.current) {
@@ -519,21 +510,21 @@ export function HeroScene({
     if (crowdPlateMaterialRef.current) {
       const crowdPlateOpacity = reducedMotion
         ? 0.42
-        : MathUtils.lerp(0.01, 0.62, portalDetailReveal) * beatOpacityScale
+        : MathUtils.lerp(0, 0.62, portalDetailReveal) * beatOpacityScale
       crowdPlateMaterialRef.current.opacity =
         crowdPlateOpacity * MathUtils.lerp(1, 0.46, thresholdFlash)
     }
     if (crowdParallaxMaterialRef.current) {
       const crowdParallaxOpacity = reducedMotion
         ? 0.18
-        : MathUtils.lerp(0.01, 0.3, portalDetailReveal) * beatOpacityScale
+        : MathUtils.lerp(0, 0.3, portalDetailReveal) * beatOpacityScale
       crowdParallaxMaterialRef.current.opacity =
         crowdParallaxOpacity * MathUtils.lerp(1, 0.28, thresholdFlash)
     }
     if (portalPhotoMaterialRef.current) {
       const photoOpacity = reducedMotion
         ? 0.26
-        : MathUtils.lerp(0.015, 0.46, portalDetailReveal) * beatOpacityScale
+        : MathUtils.lerp(0, 0.46, portalDetailReveal) * beatOpacityScale
       portalPhotoMaterialRef.current.opacity =
         photoOpacity * MathUtils.lerp(1, 0.22, thresholdFlash)
     }
@@ -603,20 +594,6 @@ export function HeroScene({
           beatOpacityScale,
         0.04,
         0.34,
-      )
-    }
-
-    for (let index = 0; index < floorGuideMaterials.current.length; index += 1) {
-      const material = floorGuideMaterials.current[index]
-      if (!material) {
-        continue
-      }
-
-      const depthRatio = index / Math.max(segmentDepths.length - 1, 1)
-      material.opacity = MathUtils.clamp(
-        MathUtils.lerp(0.025, 0.2, practicalProgress) * (1 - depthRatio * 0.42) * beatOpacityScale,
-        0.02,
-        0.25,
       )
     }
 
@@ -791,8 +768,6 @@ export function HeroScene({
         const floorY = -tunnelHeight * 0.5 + 0.1
         const ceilingY = tunnelHeight * 0.5 - 0.1
         const markerScale = MathUtils.lerp(1, 0.42, depthRatio)
-        const seamWidth = MathUtils.lerp(0.18, 0.08, depthRatio)
-        const seamCapWidth = MathUtils.lerp(0.72, 0.36, depthRatio)
 
         return (
           <group key={depth} position={[0, 0, depth]}>
@@ -912,34 +887,6 @@ export function HeroScene({
               />
             </mesh>
 
-            <mesh position={[0, floorY + 0.19, 0]}>
-              <boxGeometry args={[seamWidth, 0.03, segmentLength * 0.92]} />
-              <meshStandardMaterial color="#8a613c" roughness={0.44} metalness={0.24} />
-            </mesh>
-            <mesh position={[0, floorY + 0.205, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-              <planeGeometry args={[0.14, segmentLength * 0.8]} />
-              <meshBasicMaterial
-                ref={(material) => {
-                  if (material) {
-                    floorGuideMaterials.current[index] = material
-                  }
-                }}
-                color="#f4d4aa"
-                transparent
-                opacity={0.06}
-                blending={AdditiveBlending}
-                depthWrite={false}
-              />
-            </mesh>
-            <mesh position={[0, floorY + 0.202, -segmentLength * 0.24]}>
-              <boxGeometry args={[seamCapWidth, 0.016, 0.08]} />
-              <meshStandardMaterial color="#8a613c" roughness={0.5} metalness={0.18} />
-            </mesh>
-            <mesh position={[0, floorY + 0.202, segmentLength * 0.24]}>
-              <boxGeometry args={[seamCapWidth, 0.016, 0.08]} />
-              <meshStandardMaterial color="#8a613c" roughness={0.5} metalness={0.18} />
-            </mesh>
-
             <mesh
               position={[-wallX + 0.07, 0.6, -segmentLength * 0.22]}
               rotation={[0, Math.PI / 2, 0]}
@@ -1052,15 +999,12 @@ export function HeroScene({
 
       <mesh position={[0, 0, -84]}>
         <planeGeometry args={[10.6, 6.2]} />
-        <meshStandardMaterial
+        <meshBasicMaterial
           ref={portalMaterialRef}
           color={STYLE_TOKENS.hero.portalColor}
-          map={portalGradient ?? undefined}
-          emissive={STYLE_TOKENS.hero.portalColor}
-          emissiveMap={portalGradient ?? undefined}
-          emissiveIntensity={0.4}
-          roughness={0.16}
-          metalness={0}
+          transparent
+          opacity={0.42}
+          depthWrite={false}
         />
       </mesh>
 
@@ -1069,8 +1013,8 @@ export function HeroScene({
         <meshBasicMaterial
           ref={stadiumApertureMaterialRef}
           color="#ffd4a2"
-          map={portalGradient ?? radialBurstMask ?? undefined}
-          alphaMap={radialBurstMask ?? portalGradient ?? undefined}
+          map={glowTexture ?? radialBurstMask ?? undefined}
+          alphaMap={radialBurstMask ?? glowTexture ?? undefined}
           transparent
           opacity={0.12}
           blending={AdditiveBlending}
@@ -1103,8 +1047,8 @@ export function HeroScene({
                 }
               }}
               color="#ffd6a5"
-              map={portalGradient ?? glowTexture ?? undefined}
-              alphaMap={portalGradient ?? glowTexture ?? undefined}
+              map={glowTexture ?? portalGradient ?? undefined}
+              alphaMap={glowTexture ?? radialBurstMask ?? portalGradient ?? undefined}
               transparent
               opacity={0.08}
               blending={AdditiveBlending}
@@ -1120,8 +1064,8 @@ export function HeroScene({
                 }
               }}
               color="#ffd6a5"
-              map={portalGradient ?? glowTexture ?? undefined}
-              alphaMap={portalGradient ?? glowTexture ?? undefined}
+              map={glowTexture ?? portalGradient ?? undefined}
+              alphaMap={glowTexture ?? radialBurstMask ?? portalGradient ?? undefined}
               transparent
               opacity={0.08}
               blending={AdditiveBlending}
@@ -1136,8 +1080,8 @@ export function HeroScene({
         <meshBasicMaterial
           ref={stadiumHorizonMaterialRef}
           color="#ffd8aa"
-          map={portalGradient ?? undefined}
-          alphaMap={portalGradient ?? undefined}
+          map={glowTexture ?? radialBurstMask ?? undefined}
+          alphaMap={radialBurstMask ?? glowTexture ?? undefined}
           transparent
           opacity={0.08}
           blending={AdditiveBlending}
@@ -1162,8 +1106,7 @@ export function HeroScene({
         <planeGeometry args={[10.6, 5.6]} />
         <meshBasicMaterial
           ref={portalPhotoMaterialRef}
-          map={stadiumPortalPlateClean ?? stadiumTunnelPortal ?? undefined}
-          alphaMap={portalGradient ?? radialBurstMask ?? undefined}
+          alphaMap={radialBurstMask ?? glowTexture ?? portalGradient ?? undefined}
           color="#cda67b"
           transparent
           opacity={0.18}
