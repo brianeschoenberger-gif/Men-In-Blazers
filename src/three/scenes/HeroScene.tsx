@@ -18,9 +18,9 @@ import {
 import {
   HERO_BEATS,
   STYLE_TOKENS,
-  getBeatProgress,
   getCurrentBeat,
 } from '../../config/heroTransitionBeats'
+import { HERO_AB_TUNING } from '../../config/heroABTuning'
 import type { VisualProfile } from '../../config/visualProfiles'
 import { getAssetPath, getTextureVariantPath } from '../assets/assetManifest'
 import { DustParticles } from '../effects/DustParticles'
@@ -44,16 +44,27 @@ function easeInOutCubic(value: number) {
 
 function getTunnelRunCurve(progress: number) {
   const clamped = MathUtils.clamp(progress, 0, 1)
+  const runCurve = HERO_AB_TUNING.runCurve
+  const settleMid = (runCurve.settleStart + runCurve.settleEnd) * 0.5
+  const launch = MathUtils.smoothstep(clamped, 0, runCurve.launchEnd)
+  const cruise = MathUtils.smoothstep(clamped, runCurve.launchEnd, runCurve.cruiseEnd)
 
-  if (clamped <= 0.2) {
-    return MathUtils.lerp(0, 0.34, MathUtils.smoothstep(clamped, 0, 0.2))
-  }
+  let mapped = MathUtils.lerp(0, runCurve.launchDistance, launch)
+  mapped = Math.max(
+    mapped,
+    MathUtils.lerp(runCurve.launchDistance, runCurve.cruiseDistance, cruise),
+  )
 
-  if (clamped <= 0.7) {
-    return MathUtils.lerp(0.34, 0.9, MathUtils.smoothstep(clamped, 0.2, 0.7))
-  }
+  const settlePocket =
+    MathUtils.smoothstep(clamped, runCurve.settleStart, settleMid) *
+    (1 - MathUtils.smoothstep(clamped, settleMid, runCurve.settleEnd))
+  mapped -= settlePocket * runCurve.settleDepth
 
-  return MathUtils.lerp(0.9, 1, MathUtils.smoothstep(clamped, 0.7, 1))
+  const endPush = MathUtils.smoothstep(clamped, runCurve.endPushStart, 1)
+  mapped = MathUtils.lerp(mapped, 1, endPush)
+  mapped += endPush * runCurve.endPushDepth
+
+  return MathUtils.clamp(mapped, 0, 1)
 }
 
 function ensureUv2(geometry: BufferGeometry) {
@@ -70,7 +81,7 @@ export function HeroScene({
   allowPointerDrift,
   visualProfile,
 }: HeroSceneProps) {
-  const { camera, pointer, scene } = useThree()
+  const { camera, pointer, scene, gl } = useThree()
   const perspectiveCamera = camera as PerspectiveCamera
   const portalMaterialRef = useRef<MeshStandardMaterial>(null)
   const portalHaloMaterialRef = useRef<MeshStandardMaterial>(null)
@@ -145,6 +156,10 @@ export function HeroScene({
     getTextureVariantPath('stadium_tunnel_portal', visualProfile.textureSet),
     { srgb: true },
   )
+  const stadiumPortalPlateClean = useOptionalTexture(
+    getTextureVariantPath('stadium_portal_plate_clean', visualProfile.textureSet),
+    { srgb: true },
+  )
   const ceilingStrip = useOptionalTexture(getAssetPath('ceiling_emissive_strip'), {
     srgb: true,
   })
@@ -158,27 +173,33 @@ export function HeroScene({
   const glowTexture = useOptionalTexture(getAssetPath('glow_soft'))
 
   useEffect(() => {
-    const texturesToRepeat = [
-      wallAlbedo,
-      wallNormal,
-      wallRoughness,
-      wallAo,
-      floorAlbedo,
-      floorNormal,
-      floorRoughness,
-      floorAo,
-    ]
+    const anisotropyCap = Math.min(8, gl.capabilities.getMaxAnisotropy())
+    const wallTextures = [wallAlbedo, wallNormal, wallRoughness, wallAo]
+    const floorTextures = [floorAlbedo, floorNormal, floorRoughness, floorAo]
 
-    for (const texture of texturesToRepeat) {
+    for (const texture of wallTextures) {
       if (!texture) {
         continue
       }
 
       texture.wrapS = RepeatWrapping
       texture.wrapT = RepeatWrapping
-      texture.repeat.set(1.2, 1)
+      texture.repeat.set(1.85, 1.12)
+      texture.anisotropy = anisotropyCap
+    }
+
+    for (const texture of floorTextures) {
+      if (!texture) {
+        continue
+      }
+
+      texture.wrapS = RepeatWrapping
+      texture.wrapT = RepeatWrapping
+      texture.repeat.set(2.4, 1.18)
+      texture.anisotropy = anisotropyCap
     }
   }, [
+    gl,
     floorAlbedo,
     floorAo,
     floorNormal,
@@ -204,7 +225,6 @@ export function HeroScene({
   const clampedProgress = MathUtils.clamp(progress, 0, 1)
   const easedProgress = reducedMotion ? 0.12 : easeInOutCubic(clampedProgress)
   const beat = getCurrentBeat(HERO_BEATS, clampedProgress)
-  const beatProgress = getBeatProgress(clampedProgress, beat.start, beat.end)
   const beatOpacityScale = visualProfile.hero.beatOpacityScale[beat.id]
 
   const dustVisibility = reducedMotion
@@ -261,47 +281,63 @@ export function HeroScene({
     const normalized = reducedMotion ? 0.2 : MathUtils.clamp(progress, 0, 1)
     const eased = easeInOutCubic(normalized)
     const runCurve = reducedMotion ? 0.12 : getTunnelRunCurve(normalized)
+    const runCurveAhead = reducedMotion
+      ? runCurve
+      : getTunnelRunCurve(Math.min(1, normalized + 0.016))
+    const runVelocity = reducedMotion
+      ? 0
+      : MathUtils.clamp((runCurveAhead - runCurve) / 0.016, 0, 3.2)
     const runMotionStrength = reducedMotion
       ? 0
-      : MathUtils.smoothstep(normalized, 0.16, 0.9)
+      : MathUtils.smoothstep(runCurve, 0.08, 0.98)
+    const settlePocket = reducedMotion
+      ? 0
+      : MathUtils.smoothstep(normalized, 0.34, 0.44) *
+        (1 - MathUtils.smoothstep(normalized, 0.44, 0.58))
     const allowDrift = allowPointerDrift && !reducedMotion
 
-    const driftX = allowDrift ? pointer.x * 0.18 : 0
-    const driftY = allowDrift ? pointer.y * 0.08 : 0
-    const idleSwayX = reducedMotion ? 0 : Math.sin(elapsed * 0.22 + 1.2) * 0.05
-    const idleBreathY = reducedMotion ? 0 : Math.sin(elapsed * 0.3) * 0.04
-    const strideFrequency = 3.4 + runMotionStrength * 3.2
-    const strideBobY = reducedMotion
+    const driftX = allowDrift ? pointer.x * 0.14 : 0
+    const driftY = allowDrift ? pointer.y * 0.06 : 0
+    const idleSwayX = reducedMotion ? 0 : Math.sin(elapsed * 0.22 + 1.2) * 0.042
+    const idleBreathY = reducedMotion ? 0 : Math.sin(elapsed * 0.3) * 0.028
+    const strideFrequency = 2.7 + runVelocity * 3.8
+    const strideAmplitude = reducedMotion
       ? 0
-      : Math.sin(elapsed * strideFrequency) * 0.048 * runMotionStrength
+      : (0.024 + runMotionStrength * 0.07) * (1 - settlePocket * 0.55)
+    const strideBobY = reducedMotion ? 0 : Math.sin(elapsed * strideFrequency) * strideAmplitude
     const strideSwayX = reducedMotion
       ? 0
-      : Math.sin(elapsed * (strideFrequency * 0.5) + 0.9) * 0.034 * runMotionStrength
+      : Math.sin(elapsed * (strideFrequency * 0.52) + 0.9) * strideAmplitude * 0.72
 
     camera.position.x = MathUtils.damp(
       camera.position.x,
       driftX + idleSwayX + strideSwayX,
-      3.9,
+      MathUtils.lerp(4.8, 3.6, settlePocket),
       delta,
     )
     camera.position.y = MathUtils.damp(
       camera.position.y,
-      0.9 + driftY + idleBreathY + strideBobY,
-      4.2,
+      0.88 + driftY + idleBreathY + strideBobY,
+      MathUtils.lerp(5.1, 3.9, settlePocket),
       delta,
     )
     const targetCameraZ = reducedMotion
       ? 10.9
       : 12.2 - runCurve * visualProfile.hero.cameraTravel
-    camera.position.z = MathUtils.damp(camera.position.z, targetCameraZ, 5.4, delta)
+    camera.position.z = MathUtils.damp(
+      camera.position.z,
+      targetCameraZ,
+      MathUtils.lerp(6.4, 4.4, settlePocket),
+      delta,
+    )
 
     const targetFovBase = baseFovRef.current ?? perspectiveCamera.fov
-    const fovOpen = MathUtils.smoothstep(normalized, 0.42, 0.9)
-    const fovSettle = MathUtils.smoothstep(normalized, 0.93, 1)
+    const fovOpen = MathUtils.smoothstep(normalized, 0.28, 0.86)
+    const fovSettle = MathUtils.smoothstep(normalized, 0.9, 1)
     const targetFov = reducedMotion
       ? targetFovBase
-      : targetFovBase + fovOpen * 3.4 - fovSettle * 1.6
-    const nextFov = MathUtils.damp(perspectiveCamera.fov, targetFov, 3.4, delta)
+      : targetFovBase + fovOpen * 4.1 - fovSettle * 1.8
+    const nextFov = MathUtils.damp(perspectiveCamera.fov, targetFov, 4.1, delta)
     if (Math.abs(nextFov - perspectiveCamera.fov) > 0.005) {
       perspectiveCamera.fov = nextFov
       perspectiveCamera.updateProjectionMatrix()
@@ -309,216 +345,216 @@ export function HeroScene({
 
     const lookAheadZ = reducedMotion
       ? -28
-      : Math.min(targetCameraZ - 17, MathUtils.lerp(-34, -104, runCurve))
+      : Math.min(
+          targetCameraZ - 22,
+          MathUtils.lerp(-42, -118, runCurve) - runVelocity * 6,
+        )
     const lookAheadY =
-      0.02 +
-      (reducedMotion ? 0 : Math.sin(elapsed * 0.18) * 0.03) -
-      runMotionStrength * 0.035
+      0.01 +
+      (reducedMotion ? 0 : Math.sin(elapsed * 0.17) * 0.02) -
+      runMotionStrength * 0.05 +
+      strideBobY * 0.12
     camera.lookAt(0, lookAheadY, lookAheadZ)
 
-    const flicker = reducedMotion
+    const practicalFlicker = reducedMotion
       ? 0
-      : (Math.sin(elapsed * 8.5) + Math.sin(elapsed * 11.3 + 1.5)) * 0.03
-    const idlePulse = reducedMotion
-      ? 0
-      : Math.sin(elapsed * 1.4) * 0.1 + Math.sin(elapsed * 2.1 + 0.7) * 0.05
-    const practicalProgress = MathUtils.smoothstep(runCurve, 0.2, 0.95)
-    const nearReadLift = reducedMotion
-      ? 0.6
-      : 1 - MathUtils.smoothstep(normalized, 0.12, 0.66)
-    const midTunnelLift = reducedMotion
-      ? 0.4
-      : MathUtils.smoothstep(normalized, 0.2, 0.84)
+      : (Math.sin(elapsed * 12.4) + Math.sin(elapsed * 22.4 + 0.8)) * 0.022
+    const practicalProgress = MathUtils.smoothstep(runCurve, 0.12, 0.88)
+    const nearZoneRead = reducedMotion
+      ? 0.65
+      : 1 - MathUtils.smoothstep(normalized, 0.22, 0.68)
+    const midZoneBlend = reducedMotion
+      ? 0.35
+      : MathUtils.smoothstep(normalized, 0.2, 0.72) *
+        (1 - MathUtils.smoothstep(normalized, 0.74, 0.96))
+    const farZoneDrive = reducedMotion
+      ? 0.24
+      : MathUtils.smoothstep(normalized, 0.62, 0.98)
 
     if (scene.fog instanceof Fog) {
-      scene.fog.near = MathUtils.lerp(5.8, 7.4, eased)
-      scene.fog.far = MathUtils.lerp(118, 104, eased)
-      const fogColorLerp = MathUtils.smoothstep(eased, 0.35, 0.9)
+      scene.fog.near = MathUtils.lerp(5.2, 7.9, eased)
+      scene.fog.far = MathUtils.lerp(128, 102, eased)
+      const fogColorLerp = MathUtils.smoothstep(normalized, 0.48, 0.95)
       scene.fog.color.setRGB(
-        MathUtils.lerp(0.23, 0.16, fogColorLerp),
-        MathUtils.lerp(0.16, 0.11, fogColorLerp),
-        MathUtils.lerp(0.1, 0.07, fogColorLerp),
+        MathUtils.lerp(0.24, 0.16, fogColorLerp),
+        MathUtils.lerp(0.17, 0.11, fogColorLerp),
+        MathUtils.lerp(0.11, 0.07, fogColorLerp),
       )
     }
 
     if (ambientLightRef.current) {
       ambientLightRef.current.intensity =
-        MathUtils.lerp(0.2, 0.34, eased) + nearReadLift * 0.08
+        MathUtils.lerp(0.17, 0.24, midZoneBlend) + nearZoneRead * 0.09
     }
 
     if (hemisphereLightRef.current) {
       hemisphereLightRef.current.intensity =
-        MathUtils.lerp(0.22, 0.36, eased) + nearReadLift * 0.08
+        MathUtils.lerp(0.19, 0.29, midZoneBlend) + nearZoneRead * 0.07
     }
 
     if (tunnelEntryLightRef.current) {
       tunnelEntryLightRef.current.intensity = MathUtils.clamp(
-        MathUtils.lerp(0.62, 1.24, eased) + nearReadLift * 0.46 + flicker,
+        (MathUtils.lerp(0.84, 0.5, midZoneBlend) + nearZoneRead * 0.74) *
+          HERO_AB_TUNING.nearPracticalIntensity +
+          practicalFlicker,
         0.34,
-        1.88,
+        2.1,
       )
     }
 
     if (tunnelFillLightRef.current) {
-      tunnelFillLightRef.current.intensity = MathUtils.lerp(0.4, 0.72, eased)
+      tunnelFillLightRef.current.intensity = MathUtils.lerp(0.22, 0.38, midZoneBlend)
     }
 
     if (tunnelNearLightLeftRef.current) {
       tunnelNearLightLeftRef.current.intensity = MathUtils.clamp(
-        MathUtils.lerp(0.7, 0.22, MathUtils.smoothstep(normalized, 0.1, 0.8)) +
-          flicker * 0.4,
-        0.16,
-        0.9,
+        (MathUtils.lerp(0.92, 0.28, MathUtils.smoothstep(normalized, 0.12, 0.78)) +
+          nearZoneRead * 0.24) *
+          HERO_AB_TUNING.nearPracticalIntensity +
+          practicalFlicker * 0.65,
+        0.14,
+        1.2,
       )
     }
 
     if (tunnelNearLightRightRef.current) {
       tunnelNearLightRightRef.current.intensity = MathUtils.clamp(
-        MathUtils.lerp(0.7, 0.22, MathUtils.smoothstep(normalized, 0.1, 0.8)) +
-          flicker * 0.4,
-        0.16,
-        0.9,
+        (MathUtils.lerp(0.92, 0.28, MathUtils.smoothstep(normalized, 0.12, 0.78)) +
+          nearZoneRead * 0.24) *
+          HERO_AB_TUNING.nearPracticalIntensity +
+          practicalFlicker * 0.65,
+        0.14,
+        1.2,
       )
     }
 
     if (tunnelMidLightRef.current) {
-      tunnelMidLightRef.current.intensity = MathUtils.lerp(0.12, 0.58, midTunnelLift)
+      tunnelMidLightRef.current.intensity = MathUtils.lerp(0.08, 0.26, midZoneBlend)
     }
 
-    const portalReveal = MathUtils.smoothstep(eased, 0.48, 0.96)
-    const stadiumPayoff = MathUtils.smoothstep(eased, 0.62, 1)
-    const crowdDepthReveal = MathUtils.smoothstep(eased, 0.66, 1)
-    const thresholdFlash = reducedMotion ? 0 : MathUtils.smoothstep(normalized, 0.9, 1)
+    const portalRimReveal = MathUtils.smoothstep(eased, 0.66, 0.9)
+    const portalDetailReveal = MathUtils.smoothstep(eased, 0.82, 0.995)
+    const thresholdFlash = reducedMotion
+      ? 0
+      : MathUtils.smoothstep(normalized, HERO_AB_TUNING.flashOnset, 1)
 
     if (portalGlowLightRef.current) {
-      const beatPulse = Math.sin(elapsed * 3 + beatProgress * Math.PI) * 0.08
       portalGlowLightRef.current.intensity = MathUtils.clamp(
-        MathUtils.lerp(
-          1.08,
-          3.2 + beatPulse,
-          MathUtils.smoothstep(eased, 0.58, 1),
-        ) +
-          idlePulse +
-          thresholdFlash * 3.4,
-        0.9,
-        6.8,
+        MathUtils.lerp(0.28, 2.6, portalRimReveal) + farZoneDrive * 0.44 + thresholdFlash * 3.6,
+        0.24,
+        6.6,
       )
     }
 
     if (portalMaterialRef.current) {
       portalMaterialRef.current.emissiveIntensity = MathUtils.clamp(
-        MathUtils.lerp(1.7, 4.9, eased) + idlePulse * 0.55 + thresholdFlash * 7.6,
-        1.4,
-        11.6,
+        MathUtils.lerp(0.32, 3.8, portalRimReveal) + thresholdFlash * 7.2,
+        0.24,
+        10.8,
       )
     }
     if (portalHaloMaterialRef.current) {
-      const ringPulse = reducedMotion ? 0 : Math.sin(elapsed * 4.4 + 0.2) * 0.1
       portalHaloMaterialRef.current.emissiveIntensity = MathUtils.clamp(
-        MathUtils.lerp(0.7, 2.1, portalReveal) +
-          ringPulse +
-          idlePulse * 0.35 +
-          thresholdFlash * 2.4,
-        0.5,
-        4.2,
+        MathUtils.lerp(0.2, 1.46, portalRimReveal) + thresholdFlash * 2.2,
+        0.18,
+        4,
       )
       portalHaloMaterialRef.current.opacity = MathUtils.clamp(
-        MathUtils.lerp(0.2, 0.7, portalReveal) * beatOpacityScale +
-          thresholdFlash * 0.16,
-        0.16,
-        0.92,
+        MathUtils.lerp(0.06, 0.6, portalRimReveal) * beatOpacityScale + thresholdFlash * 0.12,
+        0.05,
+        0.88,
       )
     }
 
     if (stadiumApertureMaterialRef.current) {
       const apertureOpacity = reducedMotion
         ? 0.1
-        : (MathUtils.lerp(0.04, 0.28, stadiumPayoff) + thresholdFlash * 0.42) *
+        : (MathUtils.lerp(0.01, 0.22, portalRimReveal) + thresholdFlash * 0.34) *
           beatOpacityScale
       stadiumApertureMaterialRef.current.opacity = MathUtils.clamp(
         apertureOpacity,
-        0.06,
-        0.86,
+        0.05,
+        0.8,
       )
     }
 
     if (stadiumHorizonMaterialRef.current) {
       const horizonOpacity = reducedMotion
         ? 0.08
-        : MathUtils.lerp(0.05, 0.34, stadiumPayoff) + thresholdFlash * 0.36
+        : MathUtils.lerp(0.02, 0.26, portalDetailReveal) + thresholdFlash * 0.28
       stadiumHorizonMaterialRef.current.opacity = MathUtils.clamp(
         horizonOpacity,
-        0.06,
-        0.88,
+        0.05,
+        0.82,
       )
     }
 
     if (stadiumFrameMaterialRef.current) {
       const frameOpacity = reducedMotion
         ? 0.16
-        : (MathUtils.lerp(0.08, 0.42, stadiumPayoff) + thresholdFlash * 0.24) *
+        : (MathUtils.lerp(0.04, 0.34, portalDetailReveal) + thresholdFlash * 0.2) *
           beatOpacityScale
       stadiumFrameMaterialRef.current.opacity = MathUtils.clamp(
         frameOpacity,
         0.08,
-        0.74,
+        0.68,
       )
     }
 
     if (portalRingRef.current && !reducedMotion) {
-      portalRingRef.current.rotation.z += delta * 0.08
-      portalRingRef.current.rotation.x = Math.sin(elapsed * 0.24) * 0.04
+      portalRingRef.current.rotation.z += delta * 0.07
+      portalRingRef.current.rotation.x = Math.sin(elapsed * 0.2) * 0.03
     }
 
     if (crowdPlateMeshRef.current && !reducedMotion) {
-      crowdPlateMeshRef.current.position.y = -0.2 + runCurve * 0.08
-      crowdPlateMeshRef.current.position.z = -83.62 - runCurve * 0.12
+      crowdPlateMeshRef.current.position.y = -0.22 + runCurve * 0.09
+      crowdPlateMeshRef.current.position.z = -83.62 - runCurve * 0.16
     }
 
     if (crowdParallaxMeshRef.current && !reducedMotion) {
-      crowdParallaxMeshRef.current.position.y = 0.22 + runCurve * 0.12
-      crowdParallaxMeshRef.current.position.z = -84.95 - runCurve * 0.28
+      crowdParallaxMeshRef.current.position.y = 0.2 + runCurve * 0.14
+      crowdParallaxMeshRef.current.position.z = -84.95 - runCurve * 0.34
     }
 
     if (crowdPlateMaterialRef.current) {
       const crowdPlateOpacity = reducedMotion
         ? 0.42
-        : MathUtils.lerp(0.2, 0.66, portalReveal) * beatOpacityScale
+        : MathUtils.lerp(0.01, 0.62, portalDetailReveal) * beatOpacityScale
       crowdPlateMaterialRef.current.opacity =
-        crowdPlateOpacity * MathUtils.lerp(1, 0.42, thresholdFlash)
+        crowdPlateOpacity * MathUtils.lerp(1, 0.46, thresholdFlash)
     }
     if (crowdParallaxMaterialRef.current) {
       const crowdParallaxOpacity = reducedMotion
         ? 0.18
-        : MathUtils.lerp(0.04, 0.34, crowdDepthReveal) * beatOpacityScale
+        : MathUtils.lerp(0.01, 0.3, portalDetailReveal) * beatOpacityScale
       crowdParallaxMaterialRef.current.opacity =
-        crowdParallaxOpacity * MathUtils.lerp(1, 0.25, thresholdFlash)
+        crowdParallaxOpacity * MathUtils.lerp(1, 0.28, thresholdFlash)
     }
     if (portalPhotoMaterialRef.current) {
       const photoOpacity = reducedMotion
         ? 0.26
-        : MathUtils.lerp(0.04, 0.44, stadiumPayoff) * beatOpacityScale
+        : MathUtils.lerp(0.015, 0.46, portalDetailReveal) * beatOpacityScale
       portalPhotoMaterialRef.current.opacity =
         photoOpacity * MathUtils.lerp(1, 0.22, thresholdFlash)
     }
     if (pitchFloorMaterialRef.current) {
       const pitchFloorOpacity = reducedMotion
         ? 0.28
-        : MathUtils.lerp(0.14, 0.48, portalReveal)
+        : MathUtils.lerp(0.08, 0.42, portalRimReveal)
       pitchFloorMaterialRef.current.opacity =
-        pitchFloorOpacity * MathUtils.lerp(1, 0.46, thresholdFlash)
+        pitchFloorOpacity * MathUtils.lerp(1, 0.5, thresholdFlash)
     }
 
     if (stadiumRimLightLeftRef.current) {
       stadiumRimLightLeftRef.current.intensity = reducedMotion
         ? 0.18
-        : MathUtils.lerp(0.06, 0.82, stadiumPayoff) + idlePulse * 0.08
+        : MathUtils.lerp(0.04, 0.74, portalRimReveal)
     }
 
     if (stadiumRimLightRightRef.current) {
       stadiumRimLightRightRef.current.intensity = reducedMotion
         ? 0.18
-        : MathUtils.lerp(0.06, 0.82, stadiumPayoff) + idlePulse * 0.08
+        : MathUtils.lerp(0.04, 0.74, portalRimReveal)
     }
 
     for (let index = 0; index < stadiumShaftMaterials.current.length; index += 1) {
@@ -527,12 +563,10 @@ export function HeroScene({
         continue
       }
 
-      const shaftPulse = reducedMotion
-        ? 0
-        : Math.sin(elapsed * (1.6 + index * 0.25) + index * 0.8) * 0.05
+      const depthBias = 1 - index * 0.12
       material.opacity = MathUtils.clamp(
-        (MathUtils.lerp(0.03, 0.24, stadiumPayoff) + shaftPulse) * beatOpacityScale,
-        0.02,
+        MathUtils.lerp(0.02, 0.24, portalRimReveal) * depthBias * beatOpacityScale,
+        0.015,
         0.28,
       )
     }
@@ -544,14 +578,13 @@ export function HeroScene({
       }
 
       const depthRatio = index / Math.max(ceilingLightMaterials.current.length - 1, 1)
-      const depthBoost = MathUtils.lerp(0.18, 0.06, depthRatio)
-      const shimmer = reducedMotion
-        ? 0
-        : Math.sin(elapsed * 7.2 + index * 0.9) * 0.06
+      const depthBoost = MathUtils.lerp(0.22, 0.05, depthRatio)
+      const shimmer = reducedMotion ? 0 : Math.sin(elapsed * 7 + index * 0.9) * 0.026
       material.opacity = MathUtils.clamp(
-        MathUtils.lerp(0.14, 0.48, eased) + depthBoost + shimmer + flicker * 0.8,
-        0.1,
-        0.68,
+        (MathUtils.lerp(0.16, 0.44, practicalProgress) + depthBoost + shimmer + practicalFlicker) *
+          beatOpacityScale,
+        0.08,
+        0.66,
       )
     }
 
@@ -561,15 +594,15 @@ export function HeroScene({
         continue
       }
       const depthRatio = Math.floor(index / 2) / Math.max(segmentDepths.length - 1, 1)
-      const edgeLift = MathUtils.lerp(0.08, 0.02, depthRatio)
+      const edgeLift = MathUtils.lerp(0.1, 0.025, depthRatio)
       const stripFlicker = reducedMotion
         ? 0
-        : Math.sin(elapsed * 6.4 + index * 0.92) * 0.018
+        : Math.sin(elapsed * 6.8 + index * 0.9) * 0.018
       material.opacity = MathUtils.clamp(
-        (MathUtils.lerp(0.06, 0.24, practicalProgress) + edgeLift + stripFlicker) *
+        (MathUtils.lerp(0.05, 0.22, practicalProgress) + edgeLift + stripFlicker + practicalFlicker * 0.45) *
           beatOpacityScale,
-        0.05,
-        0.36,
+        0.04,
+        0.34,
       )
     }
 
@@ -580,15 +613,10 @@ export function HeroScene({
       }
 
       const depthRatio = index / Math.max(segmentDepths.length - 1, 1)
-      const seamShimmer = reducedMotion
-        ? 0
-        : Math.sin(elapsed * 2.8 + index * 0.6) * 0.01
       material.opacity = MathUtils.clamp(
-        (MathUtils.lerp(0.02, 0.18, practicalProgress) + seamShimmer) *
-          (1 - depthRatio * 0.42) *
-          beatOpacityScale,
+        MathUtils.lerp(0.025, 0.2, practicalProgress) * (1 - depthRatio * 0.42) * beatOpacityScale,
         0.02,
-        0.24,
+        0.25,
       )
     }
 
@@ -600,7 +628,7 @@ export function HeroScene({
 
       const depthRatio = index / Math.max(cableMaterials.current.length - 1, 1)
       material.emissiveIntensity = MathUtils.clamp(
-        MathUtils.lerp(0.04, 0.16, practicalProgress) * (1 - depthRatio * 0.38),
+        MathUtils.lerp(0.04, 0.16, practicalProgress) * (1 - depthRatio * 0.42),
         0.03,
         0.2,
       )
@@ -615,7 +643,7 @@ export function HeroScene({
         ? 0
         : Math.sin(elapsed * (0.45 + index * 0.07) + index) * 0.012
       material.opacity = MathUtils.clamp(
-        hazeOpacityBase * (index === 0 ? 1 : 0.72) + drift,
+        hazeOpacityBase * (index === 0 ? 1 : 0.74) * (0.86 + farZoneDrive * 0.2) + drift,
         0.01,
         0.16,
       )
@@ -623,11 +651,11 @@ export function HeroScene({
 
     if (!reducedMotion) {
       if (hazePlateA) {
-        hazePlateA.offset.y = -((elapsed * 0.012) % 1)
+        hazePlateA.offset.y = -((elapsed * 0.014) % 1)
         hazePlateA.offset.x = Math.sin(elapsed * 0.11) * 0.02
       }
       if (hazePlateB) {
-        hazePlateB.offset.y = -((elapsed * 0.016) % 1)
+        hazePlateB.offset.y = -((elapsed * 0.019) % 1)
         hazePlateB.offset.x = Math.sin(elapsed * 0.09 + 0.6) * 0.015
       }
     }
@@ -696,246 +724,331 @@ export function HeroScene({
       <pointLight position={[-4.7, 0.9, -56]} intensity={0.72} color="#ffd19a" />
       <pointLight position={[4.7, 0.9, -56]} intensity={0.72} color="#ffd19a" />
 
-      <group position={[0, 0, 8.8]}>
-        <mesh position={[0, 2.58, 0]}>
-          <boxGeometry args={[12.4, 0.4, 0.42]} />
-          <meshStandardMaterial color="#2c1a10" roughness={0.76} metalness={0.22} />
+      <group position={[0, 0, 9.2]}>
+        <mesh position={[0, 2.62, 0]}>
+          <boxGeometry args={[13.2, 0.58, 1.3]} />
+          <meshStandardMaterial color="#2c1a10" roughness={0.78} metalness={0.22} />
         </mesh>
-        <mesh position={[-6.12, 0.08, 0]}>
-          <boxGeometry args={[0.44, 5.4, 0.42]} />
+        <mesh position={[-6.34, 0.02, 0]}>
+          <boxGeometry args={[0.86, 6.3, 1.3]} />
           <meshStandardMaterial color="#2b170f" roughness={0.84} metalness={0.18} />
         </mesh>
-        <mesh position={[6.12, 0.08, 0]}>
-          <boxGeometry args={[0.44, 5.4, 0.42]} />
+        <mesh position={[6.34, 0.02, 0]}>
+          <boxGeometry args={[0.86, 6.3, 1.3]} />
           <meshStandardMaterial color="#2b170f" roughness={0.84} metalness={0.18} />
         </mesh>
-        <mesh position={[-6.04, 0.08, -0.22]} rotation={[0, Math.PI / 2, 0]}>
-          <planeGeometry args={[5.2, 5.2]} />
+        <mesh position={[-5.62, 0.1, -0.16]}>
+          <boxGeometry args={[0.18, 5.6, 1.08]} />
+          <meshStandardMaterial color="#3b2416" roughness={0.7} metalness={0.28} />
+        </mesh>
+        <mesh position={[5.62, 0.1, -0.16]}>
+          <boxGeometry args={[0.18, 5.6, 1.08]} />
+          <meshStandardMaterial color="#3b2416" roughness={0.7} metalness={0.28} />
+        </mesh>
+        <mesh position={[-6.08, 0.06, -0.56]} rotation={[0, Math.PI / 2, 0]}>
+          <planeGeometry args={[5.6, 5.7]} />
           <meshBasicMaterial
             color="#140d08"
             map={grimeAtlas ?? undefined}
             transparent
-            opacity={0.46}
+            opacity={0.42}
             depthWrite={false}
           />
         </mesh>
-        <mesh position={[6.04, 0.08, -0.22]} rotation={[0, -Math.PI / 2, 0]}>
-          <planeGeometry args={[5.2, 5.2]} />
+        <mesh position={[6.08, 0.06, -0.56]} rotation={[0, -Math.PI / 2, 0]}>
+          <planeGeometry args={[5.6, 5.7]} />
           <meshBasicMaterial
             color="#140d08"
             map={grimeAtlas ?? undefined}
             transparent
-            opacity={0.46}
+            opacity={0.42}
             depthWrite={false}
           />
         </mesh>
       </group>
 
-      {segmentDepths.map((depth, index) => (
-        <group key={depth} position={[0, 0, depth]}>
-          <mesh position={[0, -2.4, 0]}>
-            <boxGeometry args={[11.8, 0.32, segmentLength]} onUpdate={ensureUv2} />
-            <meshStandardMaterial
-              color={STYLE_TOKENS.hero.tunnelBase}
-              roughness={0.93}
-              metalness={0.08}
-              map={floorAlbedo ?? undefined}
-              normalMap={floorNormal ?? undefined}
-              roughnessMap={floorRoughness ?? undefined}
-              aoMap={floorAo ?? undefined}
-              aoMapIntensity={0.78}
-            />
-          </mesh>
-          <mesh position={[0, 2.4, 0]}>
-            <boxGeometry args={[11.8, 0.26, segmentLength]} onUpdate={ensureUv2} />
-            <meshStandardMaterial
-              color={STYLE_TOKENS.hero.tunnelShadow}
-              roughness={0.88}
-              metalness={0.12}
-              map={wallAlbedo ?? undefined}
-              normalMap={wallNormal ?? undefined}
-              roughnessMap={wallRoughness ?? undefined}
-              aoMap={wallAo ?? undefined}
-              aoMapIntensity={0.72}
-            />
-          </mesh>
-          <mesh position={[-5.9, 0, 0]}>
-            <boxGeometry args={[0.34, 6.1, segmentLength]} onUpdate={ensureUv2} />
-            <meshStandardMaterial
-              color="#2d1f15"
-              roughness={0.9}
-              metalness={0.1}
-              map={wallAlbedo ?? undefined}
-              normalMap={wallNormal ?? undefined}
-              roughnessMap={wallRoughness ?? undefined}
-              aoMap={wallAo ?? undefined}
-              aoMapIntensity={0.7}
-            />
-          </mesh>
-          <mesh position={[5.9, 0, 0]}>
-            <boxGeometry args={[0.34, 6.1, segmentLength]} onUpdate={ensureUv2} />
-            <meshStandardMaterial
-              color="#2d1f15"
-              roughness={0.9}
-              metalness={0.1}
-              map={wallAlbedo ?? undefined}
-              normalMap={wallNormal ?? undefined}
-              roughnessMap={wallRoughness ?? undefined}
-              aoMap={wallAo ?? undefined}
-              aoMapIntensity={0.7}
-            />
-          </mesh>
+      <group position={[0, 0, 7.4]}>
+        <mesh position={[0, 2.56, 0]}>
+          <boxGeometry args={[12.8, 0.34, 0.82]} />
+          <meshStandardMaterial color="#26160d" roughness={0.82} metalness={0.16} />
+        </mesh>
+        <mesh position={[-6.1, 0.04, 0]}>
+          <boxGeometry args={[0.52, 5.9, 0.82]} />
+          <meshStandardMaterial color="#26160d" roughness={0.84} metalness={0.16} />
+        </mesh>
+        <mesh position={[6.1, 0.04, 0]}>
+          <boxGeometry args={[0.52, 5.9, 0.82]} />
+          <meshStandardMaterial color="#26160d" roughness={0.84} metalness={0.16} />
+        </mesh>
+      </group>
 
-          <mesh position={[0, 2.03, 0]}>
-            <boxGeometry args={[11.1, 0.1, 0.2]} />
-            <meshStandardMaterial color="#4e321d" roughness={0.6} metalness={0.35} />
-          </mesh>
-          <mesh position={[-5.45, 0, 0]}>
-            <boxGeometry args={[0.12, 4.9, 0.2]} />
-            <meshStandardMaterial color="#4e321d" roughness={0.6} metalness={0.35} />
-          </mesh>
-          <mesh position={[5.45, 0, 0]}>
-            <boxGeometry args={[0.12, 4.9, 0.2]} />
-            <meshStandardMaterial color="#4e321d" roughness={0.6} metalness={0.35} />
-          </mesh>
+      {segmentDepths.map((depth, index) => {
+        const depthRatio = index / Math.max(segmentDepths.length - 1, 1)
+        const tunnelWidth = MathUtils.lerp(12, 8.6, depthRatio)
+        const tunnelHeight = MathUtils.lerp(5.9, 4.5, depthRatio)
+        const wallThickness = MathUtils.lerp(0.44, 0.28, depthRatio)
+        const wallX = tunnelWidth * 0.5 - wallThickness * 0.5
+        const floorY = -tunnelHeight * 0.5 + 0.1
+        const ceilingY = tunnelHeight * 0.5 - 0.1
+        const markerScale = MathUtils.lerp(1, 0.42, depthRatio)
+        const seamWidth = MathUtils.lerp(0.18, 0.08, depthRatio)
+        const seamCapWidth = MathUtils.lerp(0.72, 0.36, depthRatio)
 
-          <mesh position={[0, 2.2, 0]}>
-            <planeGeometry args={[0.82, 0.18]} />
-            <meshBasicMaterial
-              ref={(material) => {
-                if (material) {
-                  ceilingLightMaterials.current[index] = material
-                }
-              }}
-              color="#ffd8a8"
-              map={ceilingStrip ?? undefined}
-              transparent
-              opacity={0.2}
-              blending={AdditiveBlending}
-              depthWrite={false}
-            />
-          </mesh>
+        return (
+          <group key={depth} position={[0, 0, depth]}>
+            <mesh position={[0, floorY, 0]}>
+              <boxGeometry args={[tunnelWidth, 0.34, segmentLength]} onUpdate={ensureUv2} />
+              <meshStandardMaterial
+                color={STYLE_TOKENS.hero.tunnelBase}
+                roughness={0.93}
+                metalness={0.08}
+                map={floorAlbedo ?? undefined}
+                normalMap={floorNormal ?? undefined}
+                roughnessMap={floorRoughness ?? undefined}
+                aoMap={floorAo ?? undefined}
+                aoMapIntensity={0.82}
+              />
+            </mesh>
+            <mesh position={[0, ceilingY, 0]}>
+              <boxGeometry args={[tunnelWidth, 0.26, segmentLength]} onUpdate={ensureUv2} />
+              <meshStandardMaterial
+                color={STYLE_TOKENS.hero.tunnelShadow}
+                roughness={0.88}
+                metalness={0.12}
+                map={wallAlbedo ?? undefined}
+                normalMap={wallNormal ?? undefined}
+                roughnessMap={wallRoughness ?? undefined}
+                aoMap={wallAo ?? undefined}
+                aoMapIntensity={0.78}
+              />
+            </mesh>
+            <mesh position={[-wallX, 0, 0]}>
+              <boxGeometry args={[wallThickness, tunnelHeight + 0.35, segmentLength]} onUpdate={ensureUv2} />
+              <meshStandardMaterial
+                color="#2d1f15"
+                roughness={0.9}
+                metalness={0.1}
+                map={wallAlbedo ?? undefined}
+                normalMap={wallNormal ?? undefined}
+                roughnessMap={wallRoughness ?? undefined}
+                aoMap={wallAo ?? undefined}
+                aoMapIntensity={0.74}
+              />
+            </mesh>
+            <mesh position={[wallX, 0, 0]}>
+              <boxGeometry args={[wallThickness, tunnelHeight + 0.35, segmentLength]} onUpdate={ensureUv2} />
+              <meshStandardMaterial
+                color="#2d1f15"
+                roughness={0.9}
+                metalness={0.1}
+                map={wallAlbedo ?? undefined}
+                normalMap={wallNormal ?? undefined}
+                roughnessMap={wallRoughness ?? undefined}
+                aoMap={wallAo ?? undefined}
+                aoMapIntensity={0.74}
+              />
+            </mesh>
 
-          <mesh position={[-5.74, 1.72, 0]} rotation={[0, Math.PI / 2, 0]}>
-            <planeGeometry args={[5.9, 0.2]} />
-            <meshBasicMaterial
-              ref={(material) => {
-                if (material) {
-                  sidePracticalMaterials.current[index * 2] = material
-                }
-              }}
-              color="#f0b273"
-              map={ceilingStrip ?? undefined}
-              transparent
-              opacity={0.08}
-              blending={AdditiveBlending}
-              depthWrite={false}
-            />
-          </mesh>
-          <mesh position={[5.74, 1.72, 0]} rotation={[0, -Math.PI / 2, 0]}>
-            <planeGeometry args={[5.9, 0.2]} />
-            <meshBasicMaterial
-              ref={(material) => {
-                if (material) {
-                  sidePracticalMaterials.current[index * 2 + 1] = material
-                }
-              }}
-              color="#f0b273"
-              map={ceilingStrip ?? undefined}
-              transparent
-              opacity={0.08}
-              blending={AdditiveBlending}
-              depthWrite={false}
-            />
-          </mesh>
+            <mesh position={[0, ceilingY - 0.37, 0]}>
+              <boxGeometry args={[tunnelWidth - 0.8, 0.12, 0.22]} />
+              <meshStandardMaterial color="#4e321d" roughness={0.6} metalness={0.35} />
+            </mesh>
+            <mesh position={[-wallX + 0.28, 0, 0]}>
+              <boxGeometry args={[0.14, tunnelHeight - 0.9, 0.22]} />
+              <meshStandardMaterial color="#4e321d" roughness={0.6} metalness={0.35} />
+            </mesh>
+            <mesh position={[wallX - 0.28, 0, 0]}>
+              <boxGeometry args={[0.14, tunnelHeight - 0.9, 0.22]} />
+              <meshStandardMaterial color="#4e321d" roughness={0.6} metalness={0.35} />
+            </mesh>
 
-          <mesh position={[0, -2.235, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.12, segmentLength * 0.78]} />
-            <meshBasicMaterial
-              ref={(material) => {
-                if (material) {
-                  floorGuideMaterials.current[index] = material
-                }
-              }}
-              color="#f4d4aa"
-              transparent
-              opacity={0.06}
-              blending={AdditiveBlending}
-              depthWrite={false}
-            />
-          </mesh>
+            <mesh position={[0, ceilingY - 0.22, 0]}>
+              <planeGeometry args={[0.94, 0.2]} />
+              <meshBasicMaterial
+                ref={(material) => {
+                  if (material) {
+                    ceilingLightMaterials.current[index] = material
+                  }
+                }}
+                color="#ffd8a8"
+                map={ceilingStrip ?? undefined}
+                transparent
+                opacity={0.2}
+                blending={AdditiveBlending}
+                depthWrite={false}
+              />
+            </mesh>
 
-          {index % 2 === 0 ? (
-            <>
-              <mesh position={[-5.56, 1.34, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                <cylinderGeometry args={[0.028, 0.028, segmentLength * 0.92, 10]} />
-                <meshStandardMaterial
-                  ref={(material) => {
-                    if (material) {
-                      cableMaterials.current[index] = material
-                    }
-                  }}
-                  color="#4a3427"
-                  emissive="#20140d"
-                  emissiveIntensity={0.05}
-                  roughness={0.9}
-                  metalness={0.18}
-                />
-              </mesh>
-              <mesh position={[5.56, 1.34, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                <cylinderGeometry args={[0.028, 0.028, segmentLength * 0.92, 10]} />
-                <meshStandardMaterial
-                  ref={(material) => {
-                    if (material) {
-                      cableMaterials.current[index + segmentDepths.length] = material
-                    }
-                  }}
-                  color="#4a3427"
-                  emissive="#20140d"
-                  emissiveIntensity={0.05}
-                  roughness={0.9}
-                  metalness={0.18}
-                />
-              </mesh>
-            </>
-          ) : null}
+            <mesh position={[-wallX + 0.08, tunnelHeight * 0.29, 0]} rotation={[0, Math.PI / 2, 0]}>
+              <planeGeometry args={[segmentLength * 0.98, 0.22]} />
+              <meshBasicMaterial
+                ref={(material) => {
+                  if (material) {
+                    sidePracticalMaterials.current[index * 2] = material
+                  }
+                }}
+                color="#f0b273"
+                map={ceilingStrip ?? undefined}
+                transparent
+                opacity={0.08}
+                blending={AdditiveBlending}
+                depthWrite={false}
+              />
+            </mesh>
+            <mesh position={[wallX - 0.08, tunnelHeight * 0.29, 0]} rotation={[0, -Math.PI / 2, 0]}>
+              <planeGeometry args={[segmentLength * 0.98, 0.22]} />
+              <meshBasicMaterial
+                ref={(material) => {
+                  if (material) {
+                    sidePracticalMaterials.current[index * 2 + 1] = material
+                  }
+                }}
+                color="#f0b273"
+                map={ceilingStrip ?? undefined}
+                transparent
+                opacity={0.08}
+                blending={AdditiveBlending}
+                depthWrite={false}
+              />
+            </mesh>
 
-          {grimeAtlas && index % 3 === 0 ? (
-            <>
-              <mesh position={[-5.73, 0.12, -0.7]} rotation={[0, Math.PI / 2, 0]}>
-                <planeGeometry args={[2.4, 2.8]} />
-                <meshBasicMaterial
-                  color="#6d4e35"
-                  map={grimeAtlas}
-                  transparent
-                  opacity={0.08}
-                  depthWrite={false}
-                />
-              </mesh>
-              <mesh position={[5.73, 0.12, 0.7]} rotation={[0, -Math.PI / 2, 0]}>
-                <planeGeometry args={[2.4, 2.8]} />
-                <meshBasicMaterial
-                  color="#6d4e35"
-                  map={grimeAtlas}
-                  transparent
-                  opacity={0.08}
-                  depthWrite={false}
-                />
-              </mesh>
-              <mesh position={[0, 2.25, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                <planeGeometry args={[8.8, 1.4]} />
-                <meshBasicMaterial
-                  color="#6e4b30"
-                  map={grimeAtlas}
-                  transparent
-                  opacity={0.05}
-                  depthWrite={false}
-                />
-              </mesh>
-            </>
-          ) : null}
-        </group>
-      ))}
+            <mesh position={[0, floorY + 0.19, 0]}>
+              <boxGeometry args={[seamWidth, 0.03, segmentLength * 0.92]} />
+              <meshStandardMaterial color="#8a613c" roughness={0.44} metalness={0.24} />
+            </mesh>
+            <mesh position={[0, floorY + 0.205, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <planeGeometry args={[0.14, segmentLength * 0.8]} />
+              <meshBasicMaterial
+                ref={(material) => {
+                  if (material) {
+                    floorGuideMaterials.current[index] = material
+                  }
+                }}
+                color="#f4d4aa"
+                transparent
+                opacity={0.06}
+                blending={AdditiveBlending}
+                depthWrite={false}
+              />
+            </mesh>
+            <mesh position={[0, floorY + 0.202, -segmentLength * 0.24]}>
+              <boxGeometry args={[seamCapWidth, 0.016, 0.08]} />
+              <meshStandardMaterial color="#8a613c" roughness={0.5} metalness={0.18} />
+            </mesh>
+            <mesh position={[0, floorY + 0.202, segmentLength * 0.24]}>
+              <boxGeometry args={[seamCapWidth, 0.016, 0.08]} />
+              <meshStandardMaterial color="#8a613c" roughness={0.5} metalness={0.18} />
+            </mesh>
+
+            <mesh
+              position={[-wallX + 0.07, 0.6, -segmentLength * 0.22]}
+              rotation={[0, Math.PI / 2, 0]}
+              scale={[markerScale, markerScale, 1]}
+            >
+              <planeGeometry args={[0.82, 0.32]} />
+              <meshBasicMaterial
+                color="#d7a66f"
+                map={ceilingStrip ?? undefined}
+                transparent
+                opacity={MathUtils.lerp(0.22, 0.08, depthRatio)}
+                blending={AdditiveBlending}
+                depthWrite={false}
+              />
+            </mesh>
+            <mesh
+              position={[wallX - 0.07, 0.6, -segmentLength * 0.22]}
+              rotation={[0, -Math.PI / 2, 0]}
+              scale={[markerScale, markerScale, 1]}
+            >
+              <planeGeometry args={[0.82, 0.32]} />
+              <meshBasicMaterial
+                color="#d7a66f"
+                map={ceilingStrip ?? undefined}
+                transparent
+                opacity={MathUtils.lerp(0.22, 0.08, depthRatio)}
+                blending={AdditiveBlending}
+                depthWrite={false}
+              />
+            </mesh>
+
+            {index % 2 === 0 ? (
+              <>
+                <mesh
+                  position={[-wallX + 0.34, tunnelHeight * 0.23, 0]}
+                  rotation={[Math.PI / 2, 0, 0]}
+                >
+                  <cylinderGeometry args={[0.03, 0.03, segmentLength * 0.92, 10]} />
+                  <meshStandardMaterial
+                    ref={(material) => {
+                      if (material) {
+                        cableMaterials.current[index] = material
+                      }
+                    }}
+                    color="#4a3427"
+                    emissive="#20140d"
+                    emissiveIntensity={0.05}
+                    roughness={0.9}
+                    metalness={0.18}
+                  />
+                </mesh>
+                <mesh
+                  position={[wallX - 0.34, tunnelHeight * 0.23, 0]}
+                  rotation={[Math.PI / 2, 0, 0]}
+                >
+                  <cylinderGeometry args={[0.03, 0.03, segmentLength * 0.92, 10]} />
+                  <meshStandardMaterial
+                    ref={(material) => {
+                      if (material) {
+                        cableMaterials.current[index + segmentDepths.length] = material
+                      }
+                    }}
+                    color="#4a3427"
+                    emissive="#20140d"
+                    emissiveIntensity={0.05}
+                    roughness={0.9}
+                    metalness={0.18}
+                  />
+                </mesh>
+              </>
+            ) : null}
+
+            {grimeAtlas && index % 3 === 0 ? (
+              <>
+                <mesh position={[-wallX + 0.09, 0.08, -0.72]} rotation={[0, Math.PI / 2, 0]}>
+                  <planeGeometry args={[2.4, 2.8]} />
+                  <meshBasicMaterial
+                    color="#6d4e35"
+                    map={grimeAtlas}
+                    transparent
+                    opacity={0.08}
+                    depthWrite={false}
+                  />
+                </mesh>
+                <mesh position={[wallX - 0.09, 0.08, 0.72]} rotation={[0, -Math.PI / 2, 0]}>
+                  <planeGeometry args={[2.4, 2.8]} />
+                  <meshBasicMaterial
+                    color="#6d4e35"
+                    map={grimeAtlas}
+                    transparent
+                    opacity={0.08}
+                    depthWrite={false}
+                  />
+                </mesh>
+                <mesh position={[0, ceilingY - 0.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                  <planeGeometry args={[tunnelWidth - 3.2, 1.5]} />
+                  <meshBasicMaterial
+                    color="#6e4b30"
+                    map={grimeAtlas}
+                    transparent
+                    opacity={0.05}
+                    depthWrite={false}
+                  />
+                </mesh>
+              </>
+            ) : null}
+          </group>
+        )
+      })}
 
       <mesh position={[0, 0, -84]}>
         <planeGeometry args={[10.6, 6.2]} />
@@ -945,7 +1058,7 @@ export function HeroScene({
           map={portalGradient ?? undefined}
           emissive={STYLE_TOKENS.hero.portalColor}
           emissiveMap={portalGradient ?? undefined}
-          emissiveIntensity={1.8}
+          emissiveIntensity={0.4}
           roughness={0.16}
           metalness={0}
         />
@@ -1049,8 +1162,9 @@ export function HeroScene({
         <planeGeometry args={[10.6, 5.6]} />
         <meshBasicMaterial
           ref={portalPhotoMaterialRef}
-          map={stadiumTunnelPortal ?? undefined}
-          color="#ffdcb8"
+          map={stadiumPortalPlateClean ?? stadiumTunnelPortal ?? undefined}
+          alphaMap={portalGradient ?? radialBurstMask ?? undefined}
+          color="#cda67b"
           transparent
           opacity={0.18}
           depthWrite={false}

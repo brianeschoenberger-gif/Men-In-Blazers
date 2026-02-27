@@ -16,6 +16,62 @@
 ```
 
 ## 2026-02-27
+- Milestones touched: 1 (Hero opening narrative, tunnel depth/readability, camera inertia, late portal reveal), 2 (hero threshold flash onset/handoff timing tune).
+- Skills used (or "none"): `threejs-fundamentals`, `threejs-geometry`, `threejs-lighting`, `threejs-materials`, `threejs-textures`, `threejs-loaders`, `gsap-scrolltrigger` (skipped `threejs-postprocessing` on purpose to prioritize core scene readability/choreography before adding more FX complexity).
+- Completed:
+  - Added explicit A/B tuning registry in `src/config/heroABTuning.ts` for:
+    - `cameraTravel` per tier,
+    - `runCurve` shape,
+    - `nearPracticalIntensity`,
+    - `flashOnset`,
+    - `overlayOpacity` band.
+  - Wired those knobs into runtime:
+    - `visualProfiles` camera travel + overlay band adoption,
+    - `PageShell` hero flash onset mapping,
+    - `HeroScene` camera/lighting/reveal timing,
+    - `HeroSection` overlay/readability ramp.
+  - Rebuilt hero depth cues:
+    - stronger taper per tunnel segment (`width/height/wall thickness` falloff),
+    - thicker near-frame occluders close to camera,
+    - explicit floor seam geometry and seam caps,
+    - repeating wall marker strips with depth-based scale falloff.
+  - Implemented true 3-zone lighting behavior:
+    - near practical zone is warm/readable,
+    - mid zone stays lower contrast,
+    - far portal zone ramps later and stronger,
+    - flicker constrained to practical fixtures/material strips only.
+  - Reworked camera motion to runner inertia:
+    - stronger early acceleration profile with settle pocket,
+    - head-bob/sway tied to run velocity,
+    - deeper look-ahead targeting for directional momentum.
+  - Staged portal reveal later and more cinematically:
+    - delayed rim/detail reveal windows,
+    - held back crowd/photo layers until late beat,
+    - retained threshold whiteout near hero end via controlled `flashOnset`.
+  - Reduced early UI dominance (H1/H2):
+    - lowered early copy/kicker/CTA opacity ramps,
+    - beat-specific H1/H2 title attenuation,
+    - removed GSAP per-element `autoAlpha` overrides so beat opacity logic remains authoritative.
+  - Added cleaner portal plate variant sourced from `Assets/stadium_crowd_plate_2.png`:
+    - `src/assets/textures/hero/stadium_portal_plate_clean.png`
+    - `src/assets/textures/hero/stadium_portal_plate_clean_1k.png`
+    - wired via `assetManifest` and `HeroScene` portal photo fallback chain.
+  - Captured requested visual review checkpoints:
+    - `test-results/checks/hero-h1-0-05.png`
+    - `test-results/checks/hero-h3-0-50.png`
+    - `test-results/checks/hero-h5-0-95.png`
+    - `test-results/checks/hero-mobile-h3-0-50.png`
+    - `test-results/checks/hero-reduced-motion-h3-0-50.png`
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke` (8/8 passed)
+  - `cmd /c npx playwright test tests/visual/tmp-hero-checkpoints.spec.ts` (one-off checkpoint capture run; temp spec removed after capture)
+- Remaining / next:
+  - If H3 still feels too portal-forward on some displays, reduce `HERO_AB_TUNING.cameraTravel` by ~4-6% or shift `runCurve.cruiseDistance` down ~0.04.
+  - If H1 copy feels too subdued, increase `HERO_AB_TUNING.overlayOpacity.openingMax` by ~0.03 without changing H3-H5 readability.
+
+## 2026-02-27
 - Milestones touched: 1 (Hero scroll camera travel distance + speed retune).
 - Skills used (or "none"): `threejs-animation`, `threejs-fundamentals` (skipped additional skills because this was a focused camera path/scrub response tuning pass).
 - Completed:

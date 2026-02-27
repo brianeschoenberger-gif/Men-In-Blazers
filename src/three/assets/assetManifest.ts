@@ -43,6 +43,7 @@ export type AssetKey =
   | 'radial_burst_mask'
   | 'stadium_crowd_plate'
   | 'stadium_tunnel_portal'
+  | 'stadium_portal_plate_clean'
 
 export type AssetEntry = {
   key: AssetKey
@@ -243,6 +244,12 @@ export const ASSET_MANIFEST: Record<AssetKey, AssetEntry> = {
     key: 'stadium_tunnel_portal',
     kind: 'texture',
     path: '/src/assets/textures/hero/stadium_tunnel_portal.png',
+    optional: true,
+  },
+  stadium_portal_plate_clean: {
+    key: 'stadium_portal_plate_clean',
+    kind: 'texture',
+    path: '/src/assets/textures/hero/stadium_portal_plate_clean.png',
     optional: true,
   },
 }

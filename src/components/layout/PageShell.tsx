@@ -1,5 +1,6 @@
 import { Suspense, lazy, useMemo, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { HERO_AB_TUNING } from '../../config/heroABTuning'
 import { resolveVisualProfile } from '../../config/visualProfiles'
 import { ScenePostFx } from '../../three/postfx/ScenePostFx'
 import { HeroSection } from '../../sections/HeroSection'
@@ -120,7 +121,7 @@ export function PageShell() {
     }
 
     if (activePhase === 'hero') {
-      const heroFlash = smoothstep(heroProgress, 0.91, 1)
+      const heroFlash = smoothstep(heroProgress, HERO_AB_TUNING.flashOnset, 1)
       return clamp01(heroFlash * 0.94)
     }
 

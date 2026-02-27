@@ -5,6 +5,7 @@ import {
   type TransitionBeatId,
   type HeroBeatId,
 } from './heroTransitionBeats'
+import { HERO_AB_TUNING } from './heroABTuning'
 
 export type DeviceTierKey = 'low' | 'mid' | 'high'
 export type TextureSet = '1k' | '2k'
@@ -79,10 +80,10 @@ const BASE_PROFILES: Record<DeviceTierKey, VisualProfile> = {
       dustSizePeak: 0.058,
       lightBeamMaxOpacity: 0.36,
       hazeOpacity: 0.22,
-      cameraTravel: 91.5,
+      cameraTravel: HERO_AB_TUNING.cameraTravel.high,
       overlayOpacityBand: [
-        STYLE_TOKENS.hero.overlayOpacityMin,
-        STYLE_TOKENS.hero.overlayOpacityMax,
+        HERO_AB_TUNING.overlayOpacity.settledMin,
+        HERO_AB_TUNING.overlayOpacity.settledMax,
       ],
       beatOpacityScale: {
         H1: 0.64,
@@ -131,8 +132,11 @@ const BASE_PROFILES: Record<DeviceTierKey, VisualProfile> = {
       dustSizePeak: 0.05,
       lightBeamMaxOpacity: 0.29,
       hazeOpacity: 0.16,
-      cameraTravel: 86,
-      overlayOpacityBand: [0.3, 0.74],
+      cameraTravel: HERO_AB_TUNING.cameraTravel.mid,
+      overlayOpacityBand: [
+        HERO_AB_TUNING.overlayOpacity.settledMin - 0.02,
+        HERO_AB_TUNING.overlayOpacity.settledMax - 0.04,
+      ],
       beatOpacityScale: {
         H1: 0.66,
         H2: 0.78,
@@ -180,8 +184,11 @@ const BASE_PROFILES: Record<DeviceTierKey, VisualProfile> = {
       dustSizePeak: 0.043,
       lightBeamMaxOpacity: 0.2,
       hazeOpacity: 0.1,
-      cameraTravel: 79,
-      overlayOpacityBand: [0.27, 0.64],
+      cameraTravel: HERO_AB_TUNING.cameraTravel.low,
+      overlayOpacityBand: [
+        HERO_AB_TUNING.overlayOpacity.settledMin - 0.05,
+        HERO_AB_TUNING.overlayOpacity.settledMax - 0.1,
+      ],
       beatOpacityScale: {
         H1: 0.62,
         H2: 0.72,

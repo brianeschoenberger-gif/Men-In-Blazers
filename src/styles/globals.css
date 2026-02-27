@@ -410,7 +410,8 @@ body {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #f7c98e;
-  opacity: 0.9;
+  opacity: calc(var(--hero-kicker-opacity) * 0.82);
+  transition: opacity 220ms ease;
 }
 
 .hero-kicker {
@@ -435,7 +436,7 @@ body {
   background: linear-gradient(182deg, #fff8eb 0%, #ffdcae 52%, #ce905a 100%);
   -webkit-background-clip: text;
   background-clip: text;
-  text-shadow: 0 8px 34px rgba(9, 8, 6, 0.35);
+  text-shadow: 0 8px 34px rgba(9, 8, 6, calc(0.16 + var(--hero-overlay-opacity) * 0.36));
   opacity: var(--hero-copy-opacity);
   transform-origin: center 72%;
   transition:
@@ -465,7 +466,7 @@ body {
   font-size: 0.67rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(240, 203, 160, 0.86);
+  color: rgba(240, 203, 160, calc(0.44 + var(--hero-overlay-opacity) * 0.42));
   font-family: var(--font-accent);
   opacity: var(--hero-copy-opacity);
   transition: opacity 220ms ease;
@@ -509,22 +510,34 @@ body {
 }
 
 .hero-overlay[data-hero-beat='H1'] .hero-title {
-  filter: saturate(0.84) brightness(0.88);
-  transform: scale(0.97);
+  filter: saturate(0.78) brightness(0.82);
+  transform: scale(0.96);
+  opacity: calc(var(--hero-copy-opacity) * 0.52);
 }
 
 .hero-overlay[data-hero-beat='H1'] .hero-subtitle,
 .hero-overlay[data-hero-beat='H1'] .hero-meta,
 .hero-overlay[data-hero-beat='H1'] .cta-row {
-  opacity: calc(var(--hero-copy-opacity) * 0.74);
+  opacity: calc(var(--hero-copy-opacity) * 0.52);
+}
+
+.hero-overlay[data-hero-beat='H1'] .eyebrow,
+.hero-overlay[data-hero-beat='H1'] .hero-kicker {
+  opacity: calc(var(--hero-kicker-opacity) * 0.5);
 }
 
 .hero-overlay[data-hero-beat='H2'] .hero-title {
-  transform: scale(0.985);
+  transform: scale(0.975);
+  opacity: calc(var(--hero-copy-opacity) * 0.74);
 }
 
 .hero-overlay[data-hero-beat='H2'] .cta-row {
-  opacity: calc(var(--hero-cta-opacity) * 0.88);
+  opacity: calc(var(--hero-cta-opacity) * 0.72);
+}
+
+.hero-overlay[data-hero-beat='H2'] .hero-subtitle,
+.hero-overlay[data-hero-beat='H2'] .hero-meta {
+  opacity: calc(var(--hero-copy-opacity) * 0.74);
 }
 
 .cta-button {

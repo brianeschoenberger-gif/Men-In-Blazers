@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { HERO_AB_TUNING } from '../config/heroABTuning'
 import { HERO_BEATS, getCurrentBeat } from '../config/heroTransitionBeats'
 import { Section } from '../components/layout/Section'
 import { CTAButton } from '../components/ui/CTAButton'
@@ -25,6 +26,10 @@ function smoothstep(value: number, edge0: number, edge1: number) {
   return normalized * normalized * (3 - 2 * normalized)
 }
 
+function lerp(start: number, end: number, alpha: number) {
+  return start + (end - start) * alpha
+}
+
 export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -39,17 +44,29 @@ export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
 
   const overlayStyle = useMemo(
     () => {
-      const openingReveal = reducedMotion
+      const clampedProgress = clamp01(localProgress)
+      const identityReveal = reducedMotion
         ? 1
-        : smoothstep(Math.min(Math.max(localProgress, 0), 1), 0.06, 0.32)
+        : smoothstep(clampedProgress, 0.18, 0.58)
+      const overlayMin = lerp(
+        HERO_AB_TUNING.overlayOpacity.openingMin,
+        HERO_AB_TUNING.overlayOpacity.settledMin,
+        identityReveal,
+      )
+      const overlayMax = lerp(
+        HERO_AB_TUNING.overlayOpacity.openingMax,
+        HERO_AB_TUNING.overlayOpacity.settledMax,
+        identityReveal,
+      )
+      const overlayOpacity = lerp(overlayMin, overlayMax, clampedProgress)
 
       return {
         '--hero-overlay-opacity': reducedMotion
           ? '0.74'
-          : (0.44 + Math.min(Math.max(localProgress, 0), 1) * 0.24).toFixed(3),
-        '--hero-copy-opacity': (0.58 + openingReveal * 0.42).toFixed(3),
-        '--hero-kicker-opacity': (0.52 + openingReveal * 0.48).toFixed(3),
-        '--hero-cta-opacity': (0.46 + openingReveal * 0.54).toFixed(3),
+          : overlayOpacity.toFixed(3),
+        '--hero-copy-opacity': (0.34 + identityReveal * 0.66).toFixed(3),
+        '--hero-kicker-opacity': (0.28 + identityReveal * 0.72).toFixed(3),
+        '--hero-cta-opacity': (0.22 + identityReveal * 0.78).toFixed(3),
       } as CSSProperties
     },
     [localProgress, reducedMotion],
@@ -104,20 +121,20 @@ export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
         )
         .fromTo(
           titleRef.current,
-          { autoAlpha: 0, y: 24, letterSpacing: '0.08em' },
-          { autoAlpha: 1, y: 0, letterSpacing: '0.02em', duration: 0.76 },
+          { y: 24, letterSpacing: '0.08em' },
+          { y: 0, letterSpacing: '0.02em', duration: 0.76 },
           '-=0.45',
         )
         .fromTo(
           subtitleRef.current,
-          { autoAlpha: 0, y: 12 },
-          { autoAlpha: 1, y: 0, duration: 0.55 },
+          { y: 12 },
+          { y: 0, duration: 0.55 },
           '-=0.38',
         )
         .fromTo(
           '.cta-button',
-          { autoAlpha: 0, y: 10 },
-          { autoAlpha: 1, y: 0, duration: 0.48, stagger: 0.08 },
+          { y: 10 },
+          { y: 0, duration: 0.48, stagger: 0.08 },
           '-=0.3',
         )
     }, overlayRef)
