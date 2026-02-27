@@ -83,10 +83,10 @@ export const TRANSITION_BEATS: ProgressBeat<TransitionBeatId>[] = [
 export const STYLE_TOKENS = {
   hero: {
     portalColor: '#ffd7a1',
-    practicalColor: '#ffc891',
-    fillColor: '#d69458',
-    tunnelBase: '#3a2819',
-    tunnelShadow: '#1f140c',
+    practicalColor: '#ffd3a2',
+    fillColor: '#e2a86f',
+    tunnelBase: '#473120',
+    tunnelShadow: '#2b1b11',
     overlayOpacityMin: 0.36,
     overlayOpacityMax: 0.84,
   },

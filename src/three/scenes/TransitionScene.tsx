@@ -80,6 +80,9 @@ export function TransitionScene({
   const calmResolve = reducedMotion
     ? MathUtils.smoothstep(progress, 0.72, 1)
     : MathUtils.smoothstep(progress, 0.8, 1)
+  const entranceWhiteout = reducedMotion
+    ? 0.1
+    : 1 - MathUtils.smoothstep(clampedProgress, 0.02, 0.28)
 
   const ambientFloorOpacity = reducedMotion
     ? 0.08
@@ -112,15 +115,15 @@ export function TransitionScene({
 
   return (
     <group>
-      <ambientLight intensity={0.28 + intensity * 0.22} />
+      <ambientLight intensity={0.28 + intensity * 0.22 + entranceWhiteout * 0.52} />
       <pointLight
         position={[0, 1.6, 4]}
-        intensity={0.74 + intensity * 1.5}
+        intensity={0.74 + intensity * 1.5 + entranceWhiteout * 2.8}
         color={STYLE_TOKENS.hero.portalColor}
       />
       <pointLight
         position={[-3.5, -1.2, -10]}
-        intensity={0.4 + intensity * 1.16}
+        intensity={0.4 + intensity * 1.16 + entranceWhiteout * 0.42}
         color={STYLE_TOKENS.transition.streakColor}
       />
       <pointLight
@@ -128,6 +131,17 @@ export function TransitionScene({
         intensity={0.16 + calmResolve * 0.52}
         color={STYLE_TOKENS.transition.settleColor}
       />
+
+      <mesh position={[0, 0.1, -7.4]}>
+        <planeGeometry args={[18, 10.8]} />
+        <meshBasicMaterial
+          color="#fff7e8"
+          transparent
+          opacity={reducedMotion ? 0.06 : entranceWhiteout * 0.74}
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
 
       <EnergyParticles
         intensity={intensity}
@@ -191,4 +205,3 @@ export function TransitionScene({
     </group>
   )
 }
-

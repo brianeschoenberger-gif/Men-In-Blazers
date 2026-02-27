@@ -1,6 +1,6 @@
 {
     "version":  1,
-    "generatedAtUtc":  "2026-02-26T05:44:21Z",
+    "generatedAtUtc":  "2026-02-26T23:32:43Z",
     "root":  "Assets",
     "notes":  [
                   "This file is the canonical asset catalog for the repository.",
@@ -104,6 +104,18 @@
                        "sha256":  "2bb5149537ce0dffdc8dad87314103d24ab7f989ebec3f385671d0f5e2c94e0c",
                        "tags":  [
                                     "generated"
+                                ]
+                   },
+                   {
+                       "id":  "floor_albedo",
+                       "filename":  "floor_albedo.webp",
+                       "sourcePath":  "Assets/floor_albedo.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  2844227,
+                       "sha256":  "30c587eba7d1740cb625e1e9e72d38d38d31b47f51299aefc1a841976bfb9492",
+                       "tags":  [
+                                    "reference"
                                 ]
                    },
                    {
@@ -659,7 +671,7 @@
                                 ]
                    },
                    {
-                       "id":  "floor_albedo",
+                       "id":  "floor_albedo_2",
                        "filename":  "floor_albedo.webp",
                        "sourcePath":  "Assets/free-open/generated/textures/tunnel/floor_albedo.webp",
                        "type":  "image",
@@ -873,6 +885,54 @@
                        "tags":  [
                                     "brand"
                                 ]
+                   },
+                   {
+                       "id":  "radial_burst_mask_2",
+                       "filename":  "radial_burst_mask.webp",
+                       "sourcePath":  "Assets/radial_burst_mask.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  881038,
+                       "sha256":  "ebcb16626ce5a2b1af0f39592fda8c3910a6a876e83bc47a1b69726094f77047",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "stadium_crowd_plate_2",
+                       "filename":  "stadium_crowd_plate.webp",
+                       "sourcePath":  "Assets/stadium_crowd_plate.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  2068184,
+                       "sha256":  "853fd01b173a809f528055dcd48dd69736d79acf22d3f9ac5fd27fc9e59cdbe1",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "stadium_crowd_plate_2_2",
+                       "filename":  "stadium_crowd_plate_2.png",
+                       "sourcePath":  "Assets/stadium_crowd_plate_2.png",
+                       "type":  "image",
+                       "extension":  ".png",
+                       "sizeBytes":  2542107,
+                       "sha256":  "415aac47ac603454d7fd0d6ba1087d85a491cf17ec4b84df65c623943eea4d5b",
+                       "tags":  [
+                                    "reference"
+                                ]
+                   },
+                   {
+                       "id":  "wall_albedo_2",
+                       "filename":  "wall_albedo.webp",
+                       "sourcePath":  "Assets/wall_albedo.webp",
+                       "type":  "image",
+                       "extension":  ".webp",
+                       "sizeBytes":  2430320,
+                       "sha256":  "19acf20c7110008bdf3d8b7eb6fe199a3643f4ad50cebadd83c28688c09fef67",
+                       "tags":  [
+                                    "reference"
+                                ]
                    }
                ],
     "lookup":  {
@@ -895,6 +955,7 @@
                                          "7ff00b706188f52610c3434feb483273d9383ebf",
                                          "bafkreifykoeb5l4i52rdhb3xuubzbsnpdsh24mckv35s5abpuazrdgnkuy",
                                          "chatgpt_image_feb_25_2026_01_07_16_pm",
+                                         "floor_albedo",
                                          "ball",
                                          "blossom",
                                          "brick_bump",
@@ -939,7 +1000,7 @@
                                          "noise_tile",
                                          "radial_burst_mask",
                                          "waveform_mask",
-                                         "floor_albedo",
+                                         "floor_albedo_2",
                                          "floor_albedo_1k",
                                          "floor_ao",
                                          "floor_normal",
@@ -955,7 +1016,11 @@
                                          "wall_roughness_1k",
                                          "sources",
                                          "hq720",
-                                         "meshy_ai_tunnel_to_the_field_0226040001_texture"
+                                         "meshy_ai_tunnel_to_the_field_0226040001_texture",
+                                         "radial_burst_mask_2",
+                                         "stadium_crowd_plate_2",
+                                         "stadium_crowd_plate_2_2",
+                                         "wall_albedo_2"
                                      ]
                }
 }

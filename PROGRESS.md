@@ -15,6 +15,122 @@
 - Remaining / next:
 ```
 
+## 2026-02-27
+- Milestones touched: 1 (Hero opening readability + tunnel identity + run-feel), 2 (whiteout transition timing refinement).
+- Skills used (or "none"): `threejs-lighting`, `threejs-textures`, `threejs-animation`, `threejs-postprocessing` (skipped `threejs-shaders` to keep this pass deterministic and performant without custom shader complexity).
+- Completed:
+  - Reworked Hero opening readability (H1-H2):
+    - raised near-field readability with retuned ambient/hemi/entry/fill intensities,
+    - added near/mid tunnel lighting zones and dynamic fog tuning so early tunnel surfaces read clearly before the portal dominates.
+  - Added stronger tunnel identity props in `HeroScene`:
+    - foreground portal-frame/curtain occluders near camera,
+    - repeated utility cable conduits along walls,
+    - floor guide seam strips,
+    - additional ceiling grime breakup planes.
+  - Upgraded camera language to feel more like a run:
+    - lower camera baseline,
+    - stronger stride bob/sway and frequency envelope,
+    - later/larger FOV ramp and deeper look-ahead pull.
+  - Reduced opening text interference:
+    - added hero copy opacity variables and beat-aware weighting so H1/H2 copy reads lighter while tunnel form establishes.
+  - Refined blinding handoff timing:
+    - delayed hero flash onset (`0.91`) so detail peaks before blowout,
+    - shortened transition flash decay window for a cleaner bridge.
+  - Slightly reduced fixed hero darkening in global overlay (`page-shell[data-active-phase='hero']::before`) to avoid black crush.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke` (first run hit known flaky TourStops timeout; immediate rerun passed 8/8)
+- Remaining / next:
+  - If you want even stronger tunnel realism, next asset pass should add dedicated normal/roughness maps for the new wall/floor albedos.
+  - If the flash feels too strong/too soft, tune in `PageShell.tsx` (`heroFlash` start and transition fade end) and `ScenePostFx.tsx` (`getBloomBoost`/`getBrightnessBoost`).
+
+## 2026-02-27
+- Milestones touched: 1 (Hero threshold blowout), 2 (transition handoff as blinding light).
+- Skills used (or "none"): `threejs-lighting`, `threejs-postprocessing` (skipped `threejs-shaders` because this pass is additive/light/material choreography and post-FX tuning only).
+- Completed:
+  - Added a global phase handoff flash veil in `PageShell`/`globals.css` so the hero-to-transition swap reads as one continuous whiteout event.
+  - Hero threshold pass (`HeroScene`) now drives stronger H5 blowout:
+    - added end-of-hero flash curve,
+    - boosted portal emissive + glow intensities and halo response near threshold,
+    - increased aperture/horizon/frame brightness while fading detail layers (crowd/photo/floor) so the exit feels overexposed.
+  - Transition entrance pass (`TransitionScene`) now starts with a bright white wash and settles into existing surge choreography.
+  - Post-FX pass (`ScenePostFx`) now applies stronger bloom and temporary brightness lift at hero threshold and transition entry.
+  - Reduced-motion path remains calm by gating flash behavior down.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke` (first run hit known flaky TourStops timeout; immediate rerun passed 8/8)
+- Remaining / next:
+  - Tune the whiteout strength window if desired:
+    - stronger: widen hero flash start from `0.88 -> 0.84` and transition fade end from `0.28 -> 0.34`,
+    - softer: lower `phaseFlashOpacity` multipliers by ~10-15%.
+
+## 2026-02-27
+- Milestones touched: 1 (Hero tunnel portal/crowd texture wiring), 2 (transition radial mask refresh), 3 (Tour Stops scene backdrop texture wiring).
+- Skills used (or "none"): `threejs-textures` (skipped `threejs-shaders` because this pass only required runtime texture replacement and mesh/material hookups).
+- Completed:
+  - Wired newly generated source textures into runtime `src/assets` targets used by scenes:
+    - replaced tunnel albedo maps (`floor_albedo`, `wall_albedo` + `_1k` variants),
+    - replaced transition `radial_burst_mask`,
+    - replaced hero `stadium_crowd_plate` + `_1k` variant.
+  - Added new runtime hero texture `stadium_tunnel_portal.png` (+ `_1k`) from the generated tunnel-to-pitch image.
+  - Extended `assetManifest` with `stadium_tunnel_portal` entry.
+  - Updated `HeroScene` to render the new portal photo layer as a beat-driven plate behind the portal ring/crowd layers.
+  - Updated `TourStopsScene` to render a subtle crowd backdrop plane using the wired crowd plate texture so generated assets are visible in that scene too.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke` (first run hit the known flaky TourStops timeout; immediate rerun passed 8/8)
+- Remaining / next:
+  - Tune hero portal-photo plate opacity/scale if you want the realistic plate to read stronger or more subtle versus the stylized gradient stack.
+  - If desired, generate a dedicated high-res TourStops backdrop texture (clean, no horizon floor strip) for better side-periphery read around the pane.
+
+## 2026-02-27
+- Milestones touched: 3 (Tour Stops pane transparency/read-through polish).
+- Skills used (or "none"): none (skipped specialized skills because this was a targeted CSS opacity/blur balancing pass).
+- Completed:
+  - Reduced Tour Stops pane visual blocking so the background animation remains visible behind content.
+  - Tuned `.tour-overlay`:
+    - lowered overlay opacity and blur,
+    - reduced dark gradient density,
+    - softened box shadow and adjusted highlight/falloff.
+  - Tuned nested surfaces for consistency:
+    - `.tour-map-shell` transparency increased and blur reduced,
+    - `.tour-chip` and `.tour-chip--active` backgrounds made lighter,
+    - `.tour-panel` background/blur reduced.
+  - Kept border contrast and text readability intact while increasing scene read-through.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke` (first run: 1 timeout in tour sync test; second run: pass)
+- Remaining / next:
+  - If you want more animation visibility, next pass is to drop `.tour-overlay` effective opacity another ~10-15% and trim chip/panel fills slightly further.
+  - Optional follow-up: add a subtle animated mask/window in the pane background so motion reads through without reducing text legibility.
+
+## 2026-02-26
+- Milestones touched: 1 (Hero "Tunnel to Pitch" crowd-plate asset integration pass), 2 (transition continuity check after hero asset swap).
+- Skills used (or "none"): `threejs-textures`.
+- Completed:
+  - Evaluated new user-provided crowd-only source image (`Assets/stadium_crowd_plate_2.png`) against existing runtime hero crowd plate.
+  - Promoted new crowd plate into runtime texture set:
+    - generated crowd-focused 2:1 crop from source,
+    - wrote `src/assets/textures/hero/stadium_crowd_plate.webp` (`2048x1024`),
+    - wrote `src/assets/textures/hero/stadium_crowd_plate_1k.webp` (`1024x512`).
+  - Regenerated `Assets.json` after asset updates in `Assets/`.
+- Validation run:
+  - `powershell -ExecutionPolicy Bypass -File scripts/generate-assets-json.ps1`
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke`
+  - Captured screenshots:
+    - `test-results/checks/hero-desktop-crowdplate-v2.png`
+    - `test-results/checks/hero-pull-desktop-crowdplate-v2.png`
+    - `test-results/checks/hero-mobile-crowdplate-v2.png`
+- Remaining / next:
+  - Review in-scene payoff brightness/contrast around H4-H5 and decide whether to nudge crowd plate opacity up by ~10%.
+  - Optional: crop an additional variant with even less floor strip if you want a tighter stand-focused portal read.
+
 ## 2026-02-26
 - Milestones touched: 2 (Transition "Crowd Energy Surge" DOM overlay simplification pass).
 - Skills used (or "none"): none (skipped specialized 3D skills because this was a focused DOM/layout cleanup and smoke assertion update).

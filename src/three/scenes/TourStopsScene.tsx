@@ -12,6 +12,8 @@ import {
 } from 'three'
 import type { TourStop } from '../../data/tourStops'
 import { projectStopToMapSpace } from '../../data/tourMapProjection'
+import { getTextureVariantPath } from '../assets/assetManifest'
+import { useOptionalTexture } from '../hooks/useOptionalTexture'
 
 type TourStopsSceneProps = {
   progress: number
@@ -34,6 +36,11 @@ export function TourStopsScene({
   const glowRefs = useRef<MeshBasicMaterial[]>([])
   const routeLineRef = useRef<Line>(null)
   const routeHeadRef = useRef<Mesh>(null)
+  const crowdBackdropMaterialRef = useRef<MeshBasicMaterial>(null)
+  const crowdBackdropTexture = useOptionalTexture(
+    getTextureVariantPath('stadium_crowd_plate', '1k'),
+    { srgb: true },
+  )
 
   const projectedStops = useMemo(
     () => stops.map((stop) => projectStopToMapSpace(stop, MAP_WIDTH, MAP_HEIGHT)),
@@ -103,6 +110,17 @@ export function TourStopsScene({
 
     const elapsed = state.clock.elapsedTime
     const pulse = reducedMotion ? 0.4 : 0.5 + Math.sin(elapsed * 2.6) * 0.5
+    const crowdBackdropOpacity = reducedMotion
+      ? 0.22
+      : MathUtils.lerp(0.14, 0.34, focusDepth) + pulse * 0.06
+
+    if (crowdBackdropMaterialRef.current) {
+      crowdBackdropMaterialRef.current.opacity = MathUtils.clamp(
+        crowdBackdropOpacity,
+        0.12,
+        0.38,
+      )
+    }
 
     const activeStopIndex = Math.max(
       0,
@@ -175,6 +193,18 @@ export function TourStopsScene({
       <ambientLight intensity={0.33} />
       <pointLight position={[0, 3.4, 2.2]} intensity={1.2} color="#8ec8ff" />
       <pointLight position={[-4.6, 1.8, -3]} intensity={0.6} color="#6eaee4" />
+
+      <mesh position={[0, -0.56, -4.9]}>
+        <planeGeometry args={[13.6, 6.2]} />
+        <meshBasicMaterial
+          ref={crowdBackdropMaterialRef}
+          map={crowdBackdropTexture ?? undefined}
+          color="#7db7e6"
+          transparent
+          opacity={0.18}
+          depthWrite={false}
+        />
+      </mesh>
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.6, -1.1]}>
         <planeGeometry args={[MAP_WIDTH, MAP_HEIGHT]} />

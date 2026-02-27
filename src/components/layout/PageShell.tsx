@@ -32,6 +32,19 @@ const FeaturedStoriesScene = lazy(async () => {
   return { default: module.FeaturedStoriesScene }
 })
 
+function clamp01(value: number) {
+  return Math.min(Math.max(value, 0), 1)
+}
+
+function smoothstep(value: number, edge0: number, edge1: number) {
+  if (edge1 <= edge0) {
+    return value >= edge1 ? 1 : 0
+  }
+
+  const normalized = clamp01((value - edge0) / (edge1 - edge0))
+  return normalized * normalized * (3 - 2 * normalized)
+}
+
 export function PageShell() {
   const reducedMotion = useReducedMotion()
   const deviceTier = useDeviceTier()
@@ -100,6 +113,24 @@ export function PageShell() {
     deviceTier.allowPostFx &&
     visualProfile.allowPostFx &&
     postFxSection !== 'none'
+
+  const phaseFlashOpacity = useMemo(() => {
+    if (reducedMotion) {
+      return 0
+    }
+
+    if (activePhase === 'hero') {
+      const heroFlash = smoothstep(heroProgress, 0.91, 1)
+      return clamp01(heroFlash * 0.94)
+    }
+
+    if (activePhase === 'transition') {
+      const transitionFlash = 1 - smoothstep(transitionProgress, 0.01, 0.24)
+      return clamp01(transitionFlash * 0.9)
+    }
+
+    return 0
+  }, [activePhase, heroProgress, reducedMotion, transitionProgress])
 
   const activeScene = useMemo(() => {
     if (featuredStoriesProgress > 0.001) {
@@ -174,6 +205,11 @@ export function PageShell() {
           style={{ transform: `scaleX(${pageProgress})` }}
         />
       </div>
+      <div
+        className="phase-flash"
+        aria-hidden
+        style={{ opacity: phaseFlashOpacity }}
+      />
       <div className="canvas-shell" aria-hidden>
         <Canvas
           dpr={[1, deviceTier.dprCap]}

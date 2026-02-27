@@ -12,6 +12,19 @@ type HeroSectionProps = {
   onProgress: (value: number) => void
 }
 
+function clamp01(value: number) {
+  return Math.min(Math.max(value, 0), 1)
+}
+
+function smoothstep(value: number, edge0: number, edge1: number) {
+  if (edge1 <= edge0) {
+    return value >= edge1 ? 1 : 0
+  }
+
+  const normalized = clamp01((value - edge0) / (edge1 - edge0))
+  return normalized * normalized * (3 - 2 * normalized)
+}
+
 export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -25,12 +38,20 @@ export function HeroSection({ reducedMotion, onProgress }: HeroSectionProps) {
   )
 
   const overlayStyle = useMemo(
-    () =>
-      ({
+    () => {
+      const openingReveal = reducedMotion
+        ? 1
+        : smoothstep(Math.min(Math.max(localProgress, 0), 1), 0.06, 0.32)
+
+      return {
         '--hero-overlay-opacity': reducedMotion
           ? '0.74'
-          : (0.5 + Math.min(Math.max(localProgress, 0), 1) * 0.22).toFixed(3),
-      }) as CSSProperties,
+          : (0.44 + Math.min(Math.max(localProgress, 0), 1) * 0.24).toFixed(3),
+        '--hero-copy-opacity': (0.58 + openingReveal * 0.42).toFixed(3),
+        '--hero-kicker-opacity': (0.52 + openingReveal * 0.48).toFixed(3),
+        '--hero-cta-opacity': (0.46 + openingReveal * 0.54).toFixed(3),
+      } as CSSProperties
+    },
     [localProgress, reducedMotion],
   )
 

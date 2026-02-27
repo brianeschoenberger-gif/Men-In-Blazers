@@ -19,17 +19,35 @@ type ScenePostFxProps = {
 function getBloomBoost(section: ScenePostFxProps['section'], progress: number) {
   const clamped = MathUtils.clamp(progress, 0, 1)
   if (section === 'hero') {
-    return MathUtils.lerp(0.86, 1.18, MathUtils.smoothstep(clamped, 0.45, 0.94))
+    const base = MathUtils.lerp(0.9, 1.36, MathUtils.smoothstep(clamped, 0.45, 0.9))
+    const thresholdFlash = MathUtils.smoothstep(clamped, 0.9, 1)
+    return MathUtils.lerp(base, 2.85, thresholdFlash)
   }
 
   if (section === 'transition') {
+    const entranceFlash = 1 - MathUtils.smoothstep(clamped, 0.02, 0.3)
     if (clamped <= 0.66) {
-      return MathUtils.lerp(0.88, 1.24, MathUtils.smoothstep(clamped, 0.1, 0.66))
+      const surge = MathUtils.lerp(0.96, 1.3, MathUtils.smoothstep(clamped, 0.1, 0.66))
+      return surge + entranceFlash * 1.05
     }
-    return MathUtils.lerp(1.24, 0.92, MathUtils.smoothstep(clamped, 0.66, 1))
+    const settle = MathUtils.lerp(1.3, 0.92, MathUtils.smoothstep(clamped, 0.66, 1))
+    return settle + entranceFlash * 1.05
   }
 
   return 1
+}
+
+function getBrightnessBoost(section: ScenePostFxProps['section'], progress: number) {
+  const clamped = MathUtils.clamp(progress, 0, 1)
+  if (section === 'hero') {
+    return MathUtils.lerp(0, 0.18, MathUtils.smoothstep(clamped, 0.9, 1))
+  }
+
+  if (section === 'transition') {
+    return MathUtils.lerp(0.22, 0, MathUtils.smoothstep(clamped, 0.02, 0.34))
+  }
+
+  return 0
 }
 
 export function ScenePostFx({
@@ -43,11 +61,12 @@ export function ScenePostFx({
   }
 
   const bloomBoost = getBloomBoost(section, progress)
+  const brightnessBoost = getBrightnessBoost(section, progress)
 
   return (
     <EffectComposer enabled multisampling={0} enableNormalPass={false}>
       <BrightnessContrast
-        brightness={profile.postFx.brightness}
+        brightness={profile.postFx.brightness + brightnessBoost}
         contrast={profile.postFx.contrast}
       />
       <Bloom

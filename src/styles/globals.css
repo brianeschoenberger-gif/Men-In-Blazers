@@ -69,13 +69,13 @@ body {
       circle at 50% 38%,
       transparent 0%,
       transparent 50%,
-      rgba(0, 0, 0, 0.14) 76%,
-      rgba(0, 0, 0, 0.34) 100%
+      rgba(0, 0, 0, 0.08) 78%,
+      rgba(0, 0, 0, 0.24) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(1, 4, 10, 0.02) 0%,
-      rgba(1, 4, 10, 0.16) 100%
+      rgba(1, 4, 10, 0.01) 0%,
+      rgba(1, 4, 10, 0.1) 100%
     );
 }
 
@@ -131,6 +131,31 @@ body {
   background: linear-gradient(90deg, #61b9ff 0%, #c8ebff 45%, #81cfff 100%);
   box-shadow: 0 0 15px rgba(86, 181, 255, 0.55);
   transition: transform 200ms ease-out;
+}
+
+.phase-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 250, 241, 0.94) 0%,
+      rgba(255, 245, 230, 0.82) 24%,
+      rgba(255, 238, 218, 0.48) 48%,
+      rgba(255, 236, 214, 0.16) 70%,
+      rgba(255, 236, 214, 0) 88%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 247, 231, 0.22) 0%,
+      rgba(255, 242, 225, 0) 50%
+    );
+  filter: blur(0.4px);
+  transition: opacity 120ms linear;
+  will-change: opacity;
 }
 
 .canvas-shell {
@@ -235,6 +260,9 @@ body {
 
 .hero-overlay {
   --hero-overlay-opacity: 0.56;
+  --hero-copy-opacity: 1;
+  --hero-kicker-opacity: 1;
+  --hero-cta-opacity: 1;
   width: min(1220px, 94vw);
   margin-inline: auto;
   margin-block-start: clamp(18vh, 24vh, 30vh);
@@ -281,7 +309,28 @@ body {
 }
 
 .tour-overlay {
+  --tour-overlay-opacity: 0.22;
   width: min(920px, 100%);
+  backdrop-filter: blur(1.8px) saturate(1.02);
+  background:
+    linear-gradient(
+      155deg,
+      rgba(6, 16, 34, var(--tour-overlay-opacity)),
+      rgba(3, 9, 19, calc(var(--tour-overlay-opacity) * 0.28))
+    ),
+    radial-gradient(
+      circle at 50% 16%,
+      rgba(130, 205, 255, calc(var(--tour-overlay-opacity) * 0.18)) 0%,
+      transparent 56%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(121, 193, 239, calc(var(--tour-overlay-opacity) * 0.06)) 0%,
+      transparent 46%
+    );
+  box-shadow:
+    0 22px 46px rgba(1, 5, 12, 0.3),
+    inset 0 0 0 1px rgba(189, 228, 255, 0.04);
 }
 
 .featured-overlay {
@@ -295,10 +344,11 @@ body {
   border-radius: 14px;
   border: 1px solid rgba(133, 195, 243, 0.36);
   overflow: hidden;
+  backdrop-filter: blur(1.4px) saturate(1.04);
   background:
-    radial-gradient(circle at 24% 35%, rgba(80, 133, 186, 0.34), transparent 48%),
-    radial-gradient(circle at 74% 62%, rgba(59, 101, 145, 0.32), transparent 46%),
-    linear-gradient(160deg, rgba(12, 27, 45, 0.95), rgba(7, 15, 28, 0.86));
+    radial-gradient(circle at 24% 35%, rgba(80, 133, 186, 0.24), transparent 52%),
+    radial-gradient(circle at 74% 62%, rgba(59, 101, 145, 0.22), transparent 50%),
+    linear-gradient(160deg, rgba(12, 27, 45, 0.56), rgba(7, 15, 28, 0.42));
 }
 
 .tour-map-grid {
@@ -370,6 +420,8 @@ body {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(240, 200, 152, 0.88);
+  opacity: var(--hero-kicker-opacity);
+  transition: opacity 220ms ease;
 }
 
 .hero-title {
@@ -384,6 +436,12 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   text-shadow: 0 8px 34px rgba(9, 8, 6, 0.35);
+  opacity: var(--hero-copy-opacity);
+  transform-origin: center 72%;
+  transition:
+    opacity 220ms ease,
+    filter 220ms ease,
+    transform 260ms ease;
 }
 
 .hero-subtitle,
@@ -409,6 +467,8 @@ body {
   text-transform: uppercase;
   color: rgba(240, 203, 160, 0.86);
   font-family: var(--font-accent);
+  opacity: var(--hero-copy-opacity);
+  transition: opacity 220ms ease;
 }
 
 .transition-beat-label {
@@ -438,10 +498,33 @@ body {
   justify-content: center;
   gap: 0.85rem;
   margin-top: 1.35rem;
+  opacity: var(--hero-cta-opacity);
+  transition: opacity 220ms ease;
 }
 
 .hero-overlay .hero-subtitle {
   margin-inline: auto;
+  opacity: var(--hero-copy-opacity);
+  transition: opacity 220ms ease;
+}
+
+.hero-overlay[data-hero-beat='H1'] .hero-title {
+  filter: saturate(0.84) brightness(0.88);
+  transform: scale(0.97);
+}
+
+.hero-overlay[data-hero-beat='H1'] .hero-subtitle,
+.hero-overlay[data-hero-beat='H1'] .hero-meta,
+.hero-overlay[data-hero-beat='H1'] .cta-row {
+  opacity: calc(var(--hero-copy-opacity) * 0.74);
+}
+
+.hero-overlay[data-hero-beat='H2'] .hero-title {
+  transform: scale(0.985);
+}
+
+.hero-overlay[data-hero-beat='H2'] .cta-row {
+  opacity: calc(var(--hero-cta-opacity) * 0.88);
 }
 
 .cta-button {
@@ -567,7 +650,7 @@ body {
 .tour-chip {
   appearance: none;
   border: 1px solid rgba(132, 192, 240, 0.38);
-  background: rgba(9, 19, 36, 0.75);
+  background: rgba(9, 19, 36, 0.34);
   border-radius: 12px;
   color: #daeeff;
   min-height: 56px;
@@ -607,7 +690,7 @@ body {
 
 .tour-chip--active {
   border-color: rgba(170, 226, 255, 0.84);
-  background: rgba(20, 51, 86, 0.58);
+  background: rgba(20, 51, 86, 0.42);
   box-shadow: 0 0 20px rgba(111, 194, 250, 0.25);
 }
 
@@ -621,7 +704,8 @@ body {
   padding: 0.88rem;
   border-radius: 14px;
   border: 1px solid rgba(136, 197, 244, 0.35);
-  background: rgba(7, 15, 27, 0.72);
+  backdrop-filter: blur(1.4px) saturate(1.02);
+  background: rgba(7, 15, 27, 0.3);
 }
 
 .tour-panel__eyebrow {

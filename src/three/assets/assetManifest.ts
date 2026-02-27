@@ -42,6 +42,7 @@ export type AssetKey =
   | 'scanline_overlay'
   | 'radial_burst_mask'
   | 'stadium_crowd_plate'
+  | 'stadium_tunnel_portal'
 
 export type AssetEntry = {
   key: AssetKey
@@ -236,6 +237,12 @@ export const ASSET_MANIFEST: Record<AssetKey, AssetEntry> = {
     key: 'stadium_crowd_plate',
     kind: 'texture',
     path: '/src/assets/textures/hero/stadium_crowd_plate.webp',
+    optional: true,
+  },
+  stadium_tunnel_portal: {
+    key: 'stadium_tunnel_portal',
+    kind: 'texture',
+    path: '/src/assets/textures/hero/stadium_tunnel_portal.png',
     optional: true,
   },
 }
