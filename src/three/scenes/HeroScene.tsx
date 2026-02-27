@@ -45,15 +45,15 @@ function easeInOutCubic(value: number) {
 function getTunnelRunCurve(progress: number) {
   const clamped = MathUtils.clamp(progress, 0, 1)
 
-  if (clamped <= 0.3) {
-    return MathUtils.smoothstep(clamped, 0, 0.3) * 0.2
+  if (clamped <= 0.2) {
+    return MathUtils.lerp(0, 0.34, MathUtils.smoothstep(clamped, 0, 0.2))
   }
 
-  if (clamped <= 0.85) {
-    return MathUtils.lerp(0.2, 0.9, MathUtils.smoothstep(clamped, 0.3, 0.85))
+  if (clamped <= 0.7) {
+    return MathUtils.lerp(0.34, 0.9, MathUtils.smoothstep(clamped, 0.2, 0.7))
   }
 
-  return MathUtils.lerp(0.9, 1, MathUtils.smoothstep(clamped, 0.85, 1))
+  return MathUtils.lerp(0.9, 1, MathUtils.smoothstep(clamped, 0.7, 1))
 }
 
 function ensureUv2(geometry: BufferGeometry) {
@@ -281,21 +281,19 @@ export function HeroScene({
     camera.position.x = MathUtils.damp(
       camera.position.x,
       driftX + idleSwayX + strideSwayX,
-      3.2,
+      3.9,
       delta,
     )
     camera.position.y = MathUtils.damp(
       camera.position.y,
       0.9 + driftY + idleBreathY + strideBobY,
-      3.6,
+      4.2,
       delta,
     )
-    camera.position.z = MathUtils.damp(
-      camera.position.z,
-      reducedMotion ? 10.9 : 12.2 - runCurve * visualProfile.hero.cameraTravel,
-      3.8,
-      delta,
-    )
+    const targetCameraZ = reducedMotion
+      ? 10.9
+      : 12.2 - runCurve * visualProfile.hero.cameraTravel
+    camera.position.z = MathUtils.damp(camera.position.z, targetCameraZ, 5.4, delta)
 
     const targetFovBase = baseFovRef.current ?? perspectiveCamera.fov
     const fovOpen = MathUtils.smoothstep(normalized, 0.42, 0.9)
@@ -309,7 +307,9 @@ export function HeroScene({
       perspectiveCamera.updateProjectionMatrix()
     }
 
-    const lookAheadZ = MathUtils.lerp(-28, -58, runCurve)
+    const lookAheadZ = reducedMotion
+      ? -28
+      : Math.min(targetCameraZ - 17, MathUtils.lerp(-34, -104, runCurve))
     const lookAheadY =
       0.02 +
       (reducedMotion ? 0 : Math.sin(elapsed * 0.18) * 0.03) -

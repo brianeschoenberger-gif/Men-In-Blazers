@@ -16,6 +16,25 @@
 ```
 
 ## 2026-02-27
+- Milestones touched: 1 (Hero scroll camera travel distance + speed retune).
+- Skills used (or "none"): `threejs-animation`, `threejs-fundamentals` (skipped additional skills because this was a focused camera path/scrub response tuning pass).
+- Completed:
+  - Increased hero camera travel so scroll now carries the camera nearly the full tunnel length before transition handoff:
+    - `high`: `cameraTravel 9.2 -> 91.5`
+    - `mid`: `cameraTravel 8 -> 86`
+    - `low`: `cameraTravel 6.9 -> 79`
+  - Made run progression more aggressive (`getTunnelRunCurve`) so forward motion ramps earlier and stronger.
+  - Tightened camera damping (x/y/z) for snappier scroll response and faster perceived movement.
+  - Retuned camera look-ahead to remain deeper than camera position at end-of-hero, preventing backward-looking framing as travel distance increased.
+- Validation run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run build`
+  - `cmd /c npm run test:smoke` (8/8 passed)
+- Remaining / next:
+  - If motion is still too conservative, next step is increasing Hero section pin duration from `220vh` to `240-260vh` so full-length travel has more cinematic breathing room.
+  - If motion is too aggressive on trackpads, slightly reduce z damping (`5.4 -> 4.8`) or curve early ramp (`0.34 -> 0.3`).
+
+## 2026-02-27
 - Milestones touched: 1 (Hero opening readability + tunnel identity + run-feel), 2 (whiteout transition timing refinement).
 - Skills used (or "none"): `threejs-lighting`, `threejs-textures`, `threejs-animation`, `threejs-postprocessing` (skipped `threejs-shaders` to keep this pass deterministic and performant without custom shader complexity).
 - Completed:

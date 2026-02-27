@@ -79,7 +79,7 @@ const BASE_PROFILES: Record<DeviceTierKey, VisualProfile> = {
       dustSizePeak: 0.058,
       lightBeamMaxOpacity: 0.36,
       hazeOpacity: 0.22,
-      cameraTravel: 9.2,
+      cameraTravel: 91.5,
       overlayOpacityBand: [
         STYLE_TOKENS.hero.overlayOpacityMin,
         STYLE_TOKENS.hero.overlayOpacityMax,
@@ -131,7 +131,7 @@ const BASE_PROFILES: Record<DeviceTierKey, VisualProfile> = {
       dustSizePeak: 0.05,
       lightBeamMaxOpacity: 0.29,
       hazeOpacity: 0.16,
-      cameraTravel: 8,
+      cameraTravel: 86,
       overlayOpacityBand: [0.3, 0.74],
       beatOpacityScale: {
         H1: 0.66,
@@ -180,7 +180,7 @@ const BASE_PROFILES: Record<DeviceTierKey, VisualProfile> = {
       dustSizePeak: 0.043,
       lightBeamMaxOpacity: 0.2,
       hazeOpacity: 0.1,
-      cameraTravel: 6.9,
+      cameraTravel: 79,
       overlayOpacityBand: [0.27, 0.64],
       beatOpacityScale: {
         H1: 0.62,
